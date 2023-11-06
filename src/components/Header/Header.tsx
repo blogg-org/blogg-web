@@ -65,7 +65,7 @@ const Header: React.FC = () => {
                 <nav className="flex h-20">
                     <div className="mr-4 h-full flex items-center justify-center">
                         <Link to="/">
-                            <Logo />
+                            <Logo className="hover:fill-blue-800" />
                         </Link>
                     </div>
                     <ul className=" relative h-full flex ml-auto gap-4 text-lg">
