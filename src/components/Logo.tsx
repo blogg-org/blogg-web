@@ -1,11 +1,15 @@
 import React from "react";
 
-const Logo: React.FC = () => {
+interface LogoProps {
+    className?: string;
+}
+
+const Logo: React.FC<LogoProps> = ({ className = "" }) => {
     return (
         <svg
             version="1.0"
             xmlns="http://www.w3.org/2000/svg"
-            className="w-20 h-auto fill-blue-800 hover:fill-blue-950 transition-colors duration-200 ease-in"
+            className={`w-16 h-auto fill-blue-950 transition-colors duration-200 ease-in ${className}`}
             viewBox="0 0 330.000000 260.000000"
             preserveAspectRatio="xMidYMid meet"
         >
