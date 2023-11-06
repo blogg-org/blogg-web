@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { ISignupData } from "src/types/auth.types";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button, Input, Logo } from "@components/index";
 
 const Signup: React.FC = () => {
@@ -29,7 +29,7 @@ const Signup: React.FC = () => {
                 <p className="mt-2 text-center text-base text-black/60">
                     Already have an account?&nbsp;
                     <Link
-                        to="/login"
+                        to="/signin"
                         className="font-medium text-primary text-blue-800 transition-all duration-200 hover:underline"
                     >
                         Sign In
