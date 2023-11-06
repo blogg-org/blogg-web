@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import { Container, Logo, Avatar } from "@components/index";
 
 const Header: React.FC = () => {
-    const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+    // const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+    const isUserLoggedIn = false;
     const [showLink, setShowLink] = useState(true);
 
     const checkWindowWidth = () => {

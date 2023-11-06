@@ -38,4 +38,12 @@ module.exports = {
             version: "detect", // Automatically includes the React version
         },
     },
+    rules: {
+        "@typescript-eslint/no-misused-promises": [
+            "error",
+            {
+                checksVoidReturn: false,
+            },
+        ],
+    },
 };
