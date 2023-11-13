@@ -1,14 +1,10 @@
-import React, { useEffect } from "react";
-import { Signup as SignupComponent } from "@components/index";
+import React from "react";
+import { Signup as SignupComponent } from "@components/index.ts";
+import { useDocumentTitle } from "@hooks/useDocumentTitle";
 
 const Signup: React.FC = () => {
-    useEffect(() => {
-        document.title = "blogg - Sign up";
-
-        return () => {
-            document.title = "blogg";
-        };
-    }, []);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    useDocumentTitle("blogg - Sign up");
 
     return <SignupComponent />;
 };
