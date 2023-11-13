@@ -8,7 +8,7 @@ const store = configureStore({
     },
 });
 
-export const rootState: ReturnType<typeof store.getState> = store.getState();
+export const rootState = store.getState();
 
 // custom dispatch hook
 type AppDispatch = typeof store.dispatch;

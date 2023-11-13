@@ -1,20 +1,24 @@
 import { useForm } from "react-hook-form";
-import { ISignupData } from "src/types/auth.types";
+import { ISignupPayload } from "src/types/auth.types";
 import { Link } from "react-router-dom";
 import { Button, Input, Logo } from "@components/index";
+import { useAppDispatch, useAppSelector } from "@store/store";
+import { getAuthStatus, signup } from "@store/slice/authSlice";
 
 const Signup: React.FC = () => {
     // const navigate = useNavigate();
-    const { register, handleSubmit } = useForm<ISignupData>({
+    const dispatch = useAppDispatch();
+    const authStatus = useAppSelector(getAuthStatus);
+    const { register, handleSubmit } = useForm<ISignupPayload>({
         defaultValues: {
-            name: "",
+            fullname: "",
             email: "",
             password: "",
         },
     });
 
-    const handleSignup = (data: ISignupData) => {
-        console.log(data);
+    const handleSignup = async (data: ISignupPayload) => {
+        await dispatch(signup(data));
     };
 
     return (
@@ -41,7 +45,7 @@ const Signup: React.FC = () => {
                         <Input
                             label="Full Name: "
                             placeholder="Enter your full name"
-                            {...register("name", {
+                            {...register("fullname", {
                                 required: true,
                             })}
                         />
@@ -71,8 +75,7 @@ const Signup: React.FC = () => {
                             type="submit"
                             className="w-full hover:bg-blue-700 disabled:bg-blue-400"
                         >
-                            {/* {authStatus === "loading" ? "Signing up..." : "Sign up"} */}
-                            Sign up
+                            {authStatus === "loading" ? "Signing up..." : "Sign up"}
                         </Button>
                     </div>
                 </form>
