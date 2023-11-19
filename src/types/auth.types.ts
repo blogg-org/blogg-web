@@ -1,17 +1,19 @@
-export interface ISignupData {
-    name: string;
+export interface ISignupPayload {
+    fullname: string;
     email: string;
     password: string;
 }
 
-export interface ILoginData {
+export interface ISigninPayload {
     email: string;
     password: string;
 }
 
 export interface IUserData {
-    $id?: string;
-    name?: string;
-    email?: string;
-    avatarURL?: string;
+    _id: string;
+    fullname: string;
+    email: string;
+    __v: number;
+    createdAt: string;
+    updatedAt: string;
 }

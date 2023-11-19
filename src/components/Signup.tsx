@@ -1,20 +1,40 @@
+import { useState } from "react";
+import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
-import { ISignupData } from "src/types/auth.types";
-import { Link } from "react-router-dom";
+import { useAppDispatch } from "@store/store";
+import { signup } from "@store/slice/authSlice";
+import { Link, useNavigate } from "react-router-dom";
+import { ISignupPayload } from "src/types/auth.types";
 import { Button, Input, Logo } from "@components/index";
 
 const Signup: React.FC = () => {
-    // const navigate = useNavigate();
-    const { register, handleSubmit } = useForm<ISignupData>({
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { register, handleSubmit } = useForm<ISignupPayload>({
         defaultValues: {
-            name: "",
+            fullname: "",
             email: "",
             password: "",
         },
     });
 
-    const handleSignup = (data: ISignupData) => {
-        console.log(data);
+    const handleSignup = async (data: ISignupPayload) => {
+        try {
+            setIsLoading(true);
+            const response = await dispatch(signup(data));
+            console.log("\n:: Signup.tsx => response: ", response);
+            if (response && response.meta.requestStatus === "fulfilled") {
+                toast.success(response.payload as string, { duration: 5000 });
+                navigate("/signin");
+            } else if (response && response.meta.requestStatus === "rejected") {
+                toast.error(response.payload as string, { duration: 5000 });
+            }
+        } catch (error) {
+            console.log("\n:: Signup.tsx => Error: ", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -35,13 +55,12 @@ const Signup: React.FC = () => {
                         Sign In
                     </Link>
                 </p>
-                {/* {signupError && <p className="text-red-600 mt-8 text-center">{signupError}</p>} */}
                 <form onSubmit={handleSubmit(handleSignup)}>
                     <div className="space-y-5">
                         <Input
                             label="Full Name: "
                             placeholder="Enter your full name"
-                            {...register("name", {
+                            {...register("fullname", {
                                 required: true,
                             })}
                         />
@@ -67,12 +86,11 @@ const Signup: React.FC = () => {
                             })}
                         />
                         <Button
-                            // disabled={authStatus === "loading"}
+                            disabled={isLoading}
                             type="submit"
                             className="w-full hover:bg-blue-700 disabled:bg-blue-400"
                         >
-                            {/* {authStatus === "loading" ? "Signing up..." : "Sign up"} */}
-                            Sign up
+                            {isLoading ? "Signing up..." : "Sign up"}
                         </Button>
                     </div>
                 </form>

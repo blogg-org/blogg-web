@@ -1,6 +1,7 @@
-import { Header, Footer, Container } from "@components/index";
 import React from "react";
+import { Toaster } from "react-hot-toast";
 import { Outlet } from "react-router-dom";
+import { Header, Footer, Container } from "@components/index";
 
 const App: React.FC = () => {
     return (
@@ -12,6 +13,7 @@ const App: React.FC = () => {
                 </Container>
             </main>
             <Footer />
+            <Toaster reverseOrder={false} />
         </div>
     );
 };

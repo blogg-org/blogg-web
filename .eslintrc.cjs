@@ -29,7 +29,7 @@ module.exports = {
     },
     ignorePatterns: ["dist", ".eslintrc.cjs", "tailwind.config.js"],
     parser: "@typescript-eslint/parser",
-    plugins: ["react-refresh"],
+    plugins: ["react-refresh", "@typescript-eslint"],
     rules: {
         "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
     },
@@ -45,5 +45,7 @@ module.exports = {
                 checksVoidReturn: false,
             },
         ],
+        "@typescript-eslint/prefer-nullish-coalescing": "error",
+        "@typescript-eslint/no-unsafe-call": "error",
     },
 };

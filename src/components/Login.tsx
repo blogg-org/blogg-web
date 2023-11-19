@@ -1,13 +1,18 @@
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { ILoginData } from "src/types/auth.types";
+import { ISigninPayload } from "src/types/auth.types";
 import { Button, Input, Logo } from "@components/index";
+import { useAppDispatch, useAppSelector } from "@store/store";
+import { getAuthStatus, signin } from "@store/slice/authSlice";
 
 const Login: React.FC = () => {
-    const { register, handleSubmit } = useForm<ILoginData>();
+    const dispatch = useAppDispatch();
+    const authStatus = useAppSelector(getAuthStatus);
+    const { register, handleSubmit } = useForm<ISigninPayload>();
 
-    const handleLogin = (data: ILoginData) => {
+    const handleLogin = async (data: ISigninPayload) => {
         console.log(data);
+        await dispatch(signin(data));
     };
     return (
         <div className="flex items-center justify-center w-full">
@@ -56,8 +61,7 @@ const Login: React.FC = () => {
                             type="submit"
                             className="w-full hover:bg-blue-700 disabled:bg-blue-400"
                         >
-                            {/* {authStatus === "loading" ? "Signing in..." : "Sign in"} */}
-                            Sign in
+                            {authStatus === "loading" ? "Signing in..." : "Sign in"}
                         </Button>
                     </div>
                 </form>
