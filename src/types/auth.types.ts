@@ -10,7 +10,10 @@ export interface ISigninPayload {
 }
 
 export interface IUserData {
-    _id?: string;
-    fullname?: string;
-    email?: string;
+    _id: string;
+    fullname: string;
+    email: string;
+    __v: number;
+    createdAt: string;
+    updatedAt: string;
 }

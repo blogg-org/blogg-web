@@ -23,12 +23,12 @@ const Signup: React.FC = () => {
         try {
             setIsLoading(true);
             const response = await dispatch(signup(data));
-            if (response.type === "auth/signup/fulfilled") {
-                toast.success(`Signed up as ${response.meta.arg.email}`, { duration: 5000 });
+            console.log("\n:: Signup.tsx => response: ", response);
+            if (response && response.meta.requestStatus === "fulfilled") {
+                toast.success(response.payload as string, { duration: 5000 });
                 navigate("/signin");
-            }
-            if (response.type === "auth/signup/rejected") {
-                toast.error(response.error.message, { duration: 5000 });
+            } else if (response && response.meta.requestStatus === "rejected") {
+                toast.error(response.payload as string, { duration: 5000 });
             }
         } catch (error) {
             console.log("\n:: Signup.tsx => Error: ", error);

@@ -1,5 +1,6 @@
 import { envConfig } from "./env.config";
-import axios, { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import { IAxiosError, IAxiosResponseData } from "src/types/axiosResponse.types";
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 
 const axiosInstance: AxiosInstance = axios.create({
     baseURL: envConfig.backendBaseURI,
@@ -26,8 +27,12 @@ axiosInstance.interceptors.request.use(
 
 // Add response interceptor for better error handling
 axiosInstance.interceptors.response.use(
-    (response: AxiosResponse) => response,
-    (error: AxiosError): Promise<string> => {
+    (response: AxiosResponse<IAxiosResponseData, AxiosRequestConfig>) => {
+        console.log("\n:: response interceptor => response: ", response);
+        return response;
+    },
+    (error: AxiosError<IAxiosError>): Promise<string> => {
+        console.log("\n:: Error: ", error);
         if (error.response) {
             console.error("\n:: HTTP Error: ", error.response.status, error.response.data);
             error.message = error.response.data.message;
