@@ -1,11 +1,11 @@
-import axios, { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { envConfig } from "./env.config";
+import axios, { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 
 const axiosInstance: AxiosInstance = axios.create({
     baseURL: envConfig.backendBaseURI,
     timeout: 5000,
     headers: {
-        "Content-Type": "applications/json",
+        "Content-Type": "application/json",
     },
 });
 
@@ -17,18 +17,20 @@ axiosInstance.interceptors.request.use(
         // const token = getToken();
         // if (token) {
         //   config.headers['Authorization'] = `Bearer ${token}`;
-        // }
+        // }s
+        console.log(config);
         return config;
     },
-    (error) => Promise.reject(error)
+    (error: AxiosError): Promise<AxiosError> => Promise.reject(error)
 );
 
 // Add response interceptor for better error handling
 axiosInstance.interceptors.response.use(
-    (response: AxiosResponse) => response.data,
-    (error) => {
+    (response: AxiosResponse) => response,
+    (error: AxiosError): Promise<string> => {
         if (error.response) {
             console.error("\n:: HTTP Error: ", error.response.status, error.response.data);
+            error.message = error.response.data.message;
         } else if (error.request) {
             // Handle network-related errors (e.g., no internet connection)
             console.error("\n:: Network Error:", error.message);
@@ -36,7 +38,7 @@ axiosInstance.interceptors.response.use(
             // Handle other errors
             console.error("\n:: Error:", error.message);
         }
-        return Promise.reject(error);
+        return Promise.reject(error.message);
     }
 );
 

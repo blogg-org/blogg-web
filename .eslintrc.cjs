@@ -46,5 +46,6 @@ module.exports = {
             },
         ],
         "@typescript-eslint/prefer-nullish-coalescing": "error",
+        "@typescript-eslint/no-unsafe-call": "error",
     },
 };

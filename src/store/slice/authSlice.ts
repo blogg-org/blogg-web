@@ -1,6 +1,7 @@
+import { rootState } from "@store/store";
+import { handleSignupApi } from "@api/users.api";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ISigninPayload, ISignupPayload, IUserData } from "src/types/auth.types";
-import { rootState } from "@store/store";
 
 interface IInitialState {
     status: "idle" | "loading" | "succeeded" | "failed";
@@ -15,9 +16,15 @@ const initialState: IInitialState = {
 };
 
 // signup user
-export const signup = createAsyncThunk("auth/signup", (data: ISignupPayload) => {
-    console.log(data);
-    return { fullname: data.fullname, email: data.email };
+export const signup = createAsyncThunk("auth/signup", async (data: ISignupPayload): Promise<IUserData> => {
+    try {
+        const resData = await handleSignupApi(data);
+        const { _id, fullname, email } = (await resData.data) as IUserData;
+        return { _id, fullname, email };
+    } catch (error) {
+        console.log("\n:: Error => authSlice => signup: ", error);
+        throw error;
+    }
 });
 
 // signin user
@@ -38,7 +45,7 @@ const authSlice = createSlice({
             })
             .addCase(signup.fulfilled, (state, action) => {
                 state.status = "succeeded";
-                state.data = action.payload;
+                state.data = { ...action.payload };
                 state.error = "";
             })
             .addCase(signup.rejected, (state, action) => {

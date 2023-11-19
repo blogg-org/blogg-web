@@ -1,14 +1,16 @@
+import { useState } from "react";
+import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
+import { useAppDispatch } from "@store/store";
+import { signup } from "@store/slice/authSlice";
+import { Link, useNavigate } from "react-router-dom";
 import { ISignupPayload } from "src/types/auth.types";
-import { Link } from "react-router-dom";
 import { Button, Input, Logo } from "@components/index";
-import { useAppDispatch, useAppSelector } from "@store/store";
-import { getAuthStatus, signup } from "@store/slice/authSlice";
 
 const Signup: React.FC = () => {
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const authStatus = useAppSelector(getAuthStatus);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const { register, handleSubmit } = useForm<ISignupPayload>({
         defaultValues: {
             fullname: "",
@@ -18,7 +20,21 @@ const Signup: React.FC = () => {
     });
 
     const handleSignup = async (data: ISignupPayload) => {
-        await dispatch(signup(data));
+        try {
+            setIsLoading(true);
+            const response = await dispatch(signup(data));
+            if (response.type === "auth/signup/fulfilled") {
+                toast.success(`Signed up as ${response.meta.arg.email}`, { duration: 5000 });
+                navigate("/signin");
+            }
+            if (response.type === "auth/signup/rejected") {
+                toast.error(response.error.message, { duration: 5000 });
+            }
+        } catch (error) {
+            console.log("\n:: Signup.tsx => Error: ", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -39,7 +55,6 @@ const Signup: React.FC = () => {
                         Sign In
                     </Link>
                 </p>
-                {/* {signupError && <p className="text-red-600 mt-8 text-center">{signupError}</p>} */}
                 <form onSubmit={handleSubmit(handleSignup)}>
                     <div className="space-y-5">
                         <Input
@@ -71,11 +86,11 @@ const Signup: React.FC = () => {
                             })}
                         />
                         <Button
-                            // disabled={authStatus === "loading"}
+                            disabled={isLoading}
                             type="submit"
                             className="w-full hover:bg-blue-700 disabled:bg-blue-400"
                         >
-                            {authStatus === "loading" ? "Signing up..." : "Sign up"}
+                            {isLoading ? "Signing up..." : "Sign up"}
                         </Button>
                     </div>
                 </form>
