@@ -1,18 +1,34 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { ISigninPayload } from "src/types/auth.types";
 import { Button, Input, Logo } from "@components/index";
-import { useAppDispatch, useAppSelector } from "@store/store";
-import { getAuthStatus, signin } from "@store/slice/authSlice";
-
+import { useAppDispatch } from "@store/store";
+import { signin } from "@store/slice/authSlice";
+import { useState } from "react";
+import toast from "react-hot-toast";
+``;
 const Login: React.FC = () => {
     const dispatch = useAppDispatch();
-    const authStatus = useAppSelector(getAuthStatus);
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const { register, handleSubmit } = useForm<ISigninPayload>();
 
     const handleLogin = async (data: ISigninPayload) => {
-        console.log(data);
-        await dispatch(signin(data));
+        try {
+            setIsLoading(true);
+            const response = await dispatch(signin(data));
+            console.log("\n:: Login.tsx => response: ", response);
+            if (response && response.meta.requestStatus === "fulfilled") {
+                toast.success(response.payload as string, { duration: 5000 });
+                navigate("/");
+            } else if (response && response.meta.requestStatus === "rejected") {
+                toast.error(response.payload as string, { duration: 5000 });
+            }
+        } catch (error) {
+            console.log("\n:: Signup.tsx => Error: ", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
     return (
         <div className="flex items-center justify-center w-full">
@@ -32,7 +48,6 @@ const Login: React.FC = () => {
                         Sign Up
                     </Link>
                 </p>
-                {/* {loginError && <p className="text-red-600 mt-8 text-center">{loginError}</p>} */}
                 <form onSubmit={handleSubmit(handleLogin)} className="mt-8">
                     <div className="space-y-5">
                         <Input
@@ -57,11 +72,11 @@ const Login: React.FC = () => {
                             })}
                         />
                         <Button
-                            // disabled={authStatus === "loading"}
+                            disabled={isLoading}
                             type="submit"
                             className="w-full hover:bg-blue-700 disabled:bg-blue-400"
                         >
-                            {authStatus === "loading" ? "Signing in..." : "Sign in"}
+                            {isLoading ? "Signing in..." : "Sign in"}
                         </Button>
                     </div>
                 </form>

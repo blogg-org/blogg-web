@@ -1,5 +1,5 @@
 import { envConfig } from "./env.config";
-import { IAxiosError, IAxiosResponseData } from "src/types/axiosResponse.types";
+import { IAxiosError, IAxiosResponseData } from "src/types/axios.types";
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 
 const axiosInstance: AxiosInstance = axios.create({
