@@ -19,6 +19,7 @@
             "@assets/*": ["src/assets/*"],
             "@components/*": ["src/components/*"],
             "@config/*": ["src/config/*"],
+            "@form-validations/*": ["src/form-validations/*"],
             "@hooks/*": ["src/hooks/*"],
             "@pages/*": ["src/pages/*"],
             "@store/*": ["src/store/*"]
@@ -29,7 +30,8 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
-        "strictNullChecks": true
+        "strictNullChecks": true,
+        "strictFunctionTypes": false
     },
     "include": ["src"],
     "references": [{ "path": "./tsconfig.node.json" }]

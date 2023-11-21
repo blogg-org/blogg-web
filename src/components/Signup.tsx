@@ -6,7 +6,9 @@ import { LuEye, LuEyeOff } from "react-icons/lu";
 import { Link, useNavigate } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { ISignupPayload } from "src/types/auth.types";
-import { Button, Input, Logo } from "@components/index";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { signupSchema } from "@form-validations/signup.schema";
+import { Button, ErrorInputMessage, Input, Logo } from "@components/index";
 
 const Signup: React.FC = () => {
     const navigate = useNavigate();
@@ -18,6 +20,7 @@ const Signup: React.FC = () => {
             email: "",
             password: "",
         },
+        resolver: yupResolver(signupSchema),
     });
     const [passwordType, setPasswordType] = useState<string>("password");
 
@@ -30,6 +33,7 @@ const Signup: React.FC = () => {
     };
 
     const handleSignup = async (data: ISignupPayload) => {
+        console.log(data);
         try {
             setIsLoading(true);
             const response = await dispatch(signup(data));
@@ -69,60 +73,74 @@ const Signup: React.FC = () => {
                         Sign In
                     </Link>
                 </p>
-                <form onSubmit={handleSubmit(handleSignup)}>
+                <form onSubmit={handleSubmit(handleSignup)} className="mt-2">
                     <div className="space-y-5">
                         <Controller
                             name="fullname"
                             control={control}
                             defaultValue=""
-                            rules={{
-                                required: true,
-                            }}
-                            render={({ field }) => (
-                                <Input
-                                    label="Fullname"
-                                    type="fullname"
-                                    placeholder="Enter your fullname"
-                                    required
-                                    {...field}
-                                />
+                            render={({ field, fieldState }) => (
+                                <div className="relative">
+                                    <Input
+                                        label="Fullname"
+                                        type="fullname"
+                                        placeholder="Enter your fullname"
+                                        className={`${
+                                            fieldState.error?.message
+                                                ? "border-red-800"
+                                                : ""
+                                        }`}
+                                        {...field}
+                                    />
+                                    {fieldState.error?.message && (
+                                        <ErrorInputMessage
+                                            message={fieldState.error.message}
+                                        />
+                                    )}
+                                </div>
                             )}
                         />
+
                         <Controller
                             name="email"
                             control={control}
                             defaultValue=""
-                            rules={{
-                                required: true,
-
-                                validate: {
-                                    matchPatern: (value) =>
-                                        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(
-                                            value
-                                        ) ||
-                                        "Email address must be a valid address",
-                                },
-                            }}
-                            render={({ field }) => (
-                                <Input
-                                    label="Email"
-                                    type="email"
-                                    placeholder="Enter your email"
-                                    required
-                                    {...field}
-                                />
+                            render={({ field, fieldState }) => (
+                                <div className="relative">
+                                    <Input
+                                        label="Email"
+                                        type="email"
+                                        placeholder="Enter your email"
+                                        className={`${
+                                            fieldState.error?.message
+                                                ? "border-red-800"
+                                                : ""
+                                        }`}
+                                        {...field}
+                                    />
+                                    {fieldState.error?.message && (
+                                        <ErrorInputMessage
+                                            message={fieldState.error.message}
+                                        />
+                                    )}
+                                </div>
                             )}
                         />
                         <Controller
                             name="password"
                             control={control}
                             defaultValue=""
-                            render={({ field }) => (
+                            render={({ field, fieldState }) => (
                                 <div className="relative">
                                     <Input
-                                        label="Password"
+                                        label="Confirm Password"
                                         type={passwordType}
                                         placeholder="Enter your password"
+                                        className={`${
+                                            fieldState.error?.message
+                                                ? "border-red-800"
+                                                : ""
+                                        }`}
                                         {...field}
                                     />
                                     {field.value && (
@@ -141,6 +159,11 @@ const Signup: React.FC = () => {
                                                 <LuEyeOff />
                                             )}
                                         </div>
+                                    )}
+                                    {fieldState.error?.message && (
+                                        <ErrorInputMessage
+                                            message={fieldState.error.message}
+                                        />
                                     )}
                                 </div>
                             )}
