@@ -1,4 +1,8 @@
-import React, { HTMLInputTypeAttribute, InputHTMLAttributes, useId } from "react";
+import React, {
+    HTMLInputTypeAttribute,
+    InputHTMLAttributes,
+    useId,
+} from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     label: string;
@@ -13,7 +17,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         return (
             <div className="w-full">
                 {label && (
-                    <label htmlFor={id} className="inline-block mb-1 pl-1">
+                    <label
+                        htmlFor={id}
+                        className="inline-block mb-1 pl-1 capitalize"
+                    >
                         {label}
                     </label>
                 )}

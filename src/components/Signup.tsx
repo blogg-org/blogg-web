@@ -1,10 +1,10 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useForm } from "react-hook-form";
 import { useAppDispatch } from "@store/store";
 import { signup } from "@store/slice/authSlice";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { Link, useNavigate } from "react-router-dom";
+import { Controller, useForm } from "react-hook-form";
 import { ISignupPayload } from "src/types/auth.types";
 import { Button, Input, Logo } from "@components/index";
 
@@ -12,14 +12,22 @@ const Signup: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [passwordType, setPasswordType] = useState("password");
-    const { register, handleSubmit } = useForm<ISignupPayload>({
+    const { control, handleSubmit } = useForm<ISignupPayload>({
         defaultValues: {
             fullname: "",
             email: "",
             password: "",
         },
     });
+    const [passwordType, setPasswordType] = useState<string>("password");
+
+    const showHidePassword = () => {
+        if (passwordType === "password") {
+            setPasswordType("text");
+        } else {
+            setPasswordType("password");
+        }
+    };
 
     const handleSignup = async (data: ISignupPayload) => {
         try {
@@ -41,13 +49,17 @@ const Signup: React.FC = () => {
 
     return (
         <div className="flex items-center justify-center">
-            <div className={`mx-auto w-full max-w-lg bg-blue-100 rounded-xl p-10 border border-black/10`}>
+            <div
+                className={`mx-auto w-full max-w-lg bg-blue-100 rounded-xl p-10 border border-black/10`}
+            >
                 <div className="mb-2 flex justify-center">
                     <span className="inline-flex justify-center w-full max-w-[100px]">
                         <Logo />
                     </span>
                 </div>
-                <h2 className="text-center text-2xl font-bold leading-tight">Sign up to create account</h2>
+                <h2 className="text-center text-2xl font-bold leading-tight">
+                    Sign up to create account
+                </h2>
                 <p className="mt-2 text-center text-base text-black/60">
                     Already have an account?&nbsp;
                     <Link
@@ -59,47 +71,80 @@ const Signup: React.FC = () => {
                 </p>
                 <form onSubmit={handleSubmit(handleSignup)}>
                     <div className="space-y-5">
-                        <Input
-                            label="Full Name: "
-                            placeholder="Enter your full name"
-                            {...register("fullname", {
+                        <Controller
+                            name="fullname"
+                            control={control}
+                            defaultValue=""
+                            rules={{
                                 required: true,
-                            })}
+                            }}
+                            render={({ field }) => (
+                                <Input
+                                    label="Fullname"
+                                    type="fullname"
+                                    placeholder="Enter your fullname"
+                                    required
+                                    {...field}
+                                />
+                            )}
                         />
-                        <Input
-                            label="Email: "
-                            placeholder="Enter your email"
-                            type="email"
-                            {...register("email", {
+                        <Controller
+                            name="email"
+                            control={control}
+                            defaultValue=""
+                            rules={{
                                 required: true,
+
                                 validate: {
                                     matchPatern: (value) =>
-                                        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
+                                        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(
+                                            value
+                                        ) ||
                                         "Email address must be a valid address",
                                 },
-                            })}
+                            }}
+                            render={({ field }) => (
+                                <Input
+                                    label="Email"
+                                    type="email"
+                                    placeholder="Enter your email"
+                                    required
+                                    {...field}
+                                />
+                            )}
                         />
-                        <div className="relative">
-                            <Input
-                                label="Password: "
-                                type={passwordType}
-                                placeholder="Enter your password"
-                                {...register("password", {
-                                    required: true,
-                                })}
-                            />
-                            <div className="absolute top-10 right-3 hover:cursor-pointer scale-125">
-                                {passwordType === "password" ? (
-                                    <div onClick={() => setPasswordType("text")} title="show password">
-                                        <LuEye />
-                                    </div>
-                                ) : (
-                                    <div onClick={() => setPasswordType("password")} title="hide password">
-                                        <LuEyeOff />
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                        <Controller
+                            name="password"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                                <div className="relative">
+                                    <Input
+                                        label="Password"
+                                        type={passwordType}
+                                        placeholder="Enter your password"
+                                        {...field}
+                                    />
+                                    {field.value && (
+                                        <div
+                                            className="absolute top-12 -translate-y-1/2 right-3 hover:cursor-pointer scale-125"
+                                            onClick={showHidePassword}
+                                            title={`${
+                                                passwordType === "password"
+                                                    ? "show"
+                                                    : "hide"
+                                            } password`}
+                                        >
+                                            {passwordType === "password" ? (
+                                                <LuEye />
+                                            ) : (
+                                                <LuEyeOff />
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        />
                         <Button
                             disabled={isLoading}
                             type="submit"

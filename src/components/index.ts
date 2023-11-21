@@ -9,4 +9,15 @@ import Avatar from "./Header/Avatar";
 import AuthLayout from "./AuthLayout";
 import Container from "./Container/Container";
 
-export { Container, Header, Footer, Logo, AuthLayout, Avatar, Login, Button, Input, Signup };
+export {
+    Container,
+    Header,
+    Footer,
+    Logo,
+    AuthLayout,
+    Avatar,
+    Login,
+    Button,
+    Input,
+    Signup,
+};
