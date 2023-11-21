@@ -8,6 +8,7 @@ import Footer from "./Footer/Footer";
 import Avatar from "./Header/Avatar";
 import AuthLayout from "./AuthLayout";
 import Container from "./Container/Container";
+import ErrorInputMessage from "./ErrorInputMessage";
 
 export {
     Container,
@@ -20,4 +21,5 @@ export {
     Button,
     Input,
     Signup,
+    ErrorInputMessage,
 };
