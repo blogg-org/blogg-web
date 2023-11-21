@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { useAppDispatch } from "@store/store";
 import { signup } from "@store/slice/authSlice";
+import { LuEye, LuEyeOff } from "react-icons/lu";
 import { Link, useNavigate } from "react-router-dom";
 import { ISignupPayload } from "src/types/auth.types";
 import { Button, Input, Logo } from "@components/index";
@@ -11,6 +12,7 @@ const Signup: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [passwordType, setPasswordType] = useState("password");
     const { register, handleSubmit } = useForm<ISignupPayload>({
         defaultValues: {
             fullname: "",
@@ -77,14 +79,27 @@ const Signup: React.FC = () => {
                                 },
                             })}
                         />
-                        <Input
-                            label="Password: "
-                            type="password"
-                            placeholder="Enter your password"
-                            {...register("password", {
-                                required: true,
-                            })}
-                        />
+                        <div className="relative">
+                            <Input
+                                label="Password: "
+                                type={passwordType}
+                                placeholder="Enter your password"
+                                {...register("password", {
+                                    required: true,
+                                })}
+                            />
+                            <div className="absolute top-10 right-3 hover:cursor-pointer scale-125">
+                                {passwordType === "password" ? (
+                                    <div onClick={() => setPasswordType("text")} title="show password">
+                                        <LuEye />
+                                    </div>
+                                ) : (
+                                    <div onClick={() => setPasswordType("password")} title="hide password">
+                                        <LuEyeOff />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                         <Button
                             disabled={isLoading}
                             type="submit"
