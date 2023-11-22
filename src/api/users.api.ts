@@ -3,9 +3,14 @@ import { ISigninPayload, ISignupPayload } from "src/types/auth.types";
 import { IAxiosResponseData } from "src/types/axios.types";
 
 // handle signup
-export const handleSignupApi = async (data: ISignupPayload): Promise<IAxiosResponseData> => {
+export const handleSignupApi = async (
+    data: ISignupPayload
+): Promise<IAxiosResponseData> => {
     try {
-        const response = await axiosInstance.post<Promise<IAxiosResponseData>>(`/users/signup`, data);
+        const response = await axiosInstance.post<Promise<IAxiosResponseData>>(
+            `/v1/auth/signup`,
+            data
+        );
         console.log("\n:: users.api => response: ", response);
         return await response.data;
     } catch (error) {
@@ -15,10 +20,18 @@ export const handleSignupApi = async (data: ISignupPayload): Promise<IAxiosRespo
 };
 
 // handle signin
-export const handleSigninApi = async (data: ISigninPayload): Promise<IAxiosResponseData> => {
+export const handleSigninApi = async (
+    data: ISigninPayload
+): Promise<IAxiosResponseData> => {
     try {
-        const response = await axiosInstance.post<Promise<IAxiosResponseData>>(`/users/signin`, data);
-        console.log("\n:: users.api => handleSigninApi => response.data: ", response.data);
+        const response = await axiosInstance.post<Promise<IAxiosResponseData>>(
+            `/v1/auth/signin`,
+            data
+        );
+        console.log(
+            "\n:: users.api => handleSigninApi => response.data: ",
+            response.data
+        );
         return await response.data;
     } catch (error) {
         console.log("\n:: Error => users.api => handleSigninApi: ", error);
