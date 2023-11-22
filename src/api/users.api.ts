@@ -8,7 +8,7 @@ export const handleSignupApi = async (
 ): Promise<IAxiosResponseData> => {
     try {
         const response = await axiosInstance.post<Promise<IAxiosResponseData>>(
-            `/v1/auth/signup`,
+            `/api/v1/auth/signup`,
             data
         );
         console.log("\n:: users.api => response: ", response);
@@ -25,7 +25,7 @@ export const handleSigninApi = async (
 ): Promise<IAxiosResponseData> => {
     try {
         const response = await axiosInstance.post<Promise<IAxiosResponseData>>(
-            `/v1/auth/signin`,
+            `/api/v1/auth/signin`,
             data
         );
         console.log(
