@@ -1,10 +1,12 @@
 import { Link, NavLink } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Container, Logo, Avatar } from "@components/index";
+import { useAppSelector } from "@store/store";
+import { getLoginStatus } from "@store/slice/authSlice";
 
 const Header: React.FC = () => {
     // const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-    const isUserLoggedIn = false;
+    const isUserLoggedIn = useAppSelector(getLoginStatus) === "true";
     const [showLink, setShowLink] = useState(true);
 
     const checkWindowWidth = () => {
@@ -77,7 +79,11 @@ const Header: React.FC = () => {
                                             to={item.slug}
                                             className={({ isActive }) =>
                                                 `h-full px-4 flex justify-center items-center hover:bg-blue-300 transition-colors duration-200 ease-in
-                                            ${isActive ? "bg-blue-300 font-medium text-blue-950" : ""}
+                                            ${
+                                                isActive
+                                                    ? "bg-blue-300 font-medium text-blue-950"
+                                                    : ""
+                                            }
                                             `
                                             }
                                         >

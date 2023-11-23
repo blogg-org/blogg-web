@@ -1,25 +1,44 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import defaultUserIcon from "@assets/user-alien.svg";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "@store/store";
+import {
+    currentUser,
+    getAuthData,
+    getLoginStatus,
+    signout,
+} from "@store/slice/authSlice";
+import toast from "react-hot-toast";
 
 interface AvatarProps {
     showLink: boolean;
 }
 
 const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const isUserLoggedIn = useAppSelector(getLoginStatus) === "true";
+    const authData = useAppSelector(getAuthData);
 
-    const userData = {
-        name: "Ramesh",
-        email: "ramesh@gmail.com",
-        isUserLoggedIn: false,
-        authStatus: "succeeded",
+    const handleLogout = async () => {
+        const response = await dispatch(signout());
+        if (response && response.meta.requestStatus === "fulfilled") {
+            toast.success(response.payload as string, { duration: 5000 });
+            navigate("/");
+        } else if (response && response.meta.requestStatus === "rejected") {
+            toast.error(response.payload as string, { duration: 5000 });
+        }
     };
 
-    const handleLogout = () => {
-        navigate("/");
-    };
+    useEffect(() => {
+        // IIFE (immediately invoked function expression)
+        (async () => {
+            if (isUserLoggedIn) {
+                await dispatch(currentUser());
+            }
+        })();
+    }, [isUserLoggedIn, dispatch]);
 
     return (
         <Menu as="div" className="group relative z-50">
@@ -27,7 +46,13 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                 className="flex justify-center items-center rounded-full border-4 border-white group-hover:border-blue-400 transition-colors duration-200 ease-in"
                 title="Menu"
             >
-                <img src={defaultUserIcon} alt="avatar" width={40} height={40} className="bg-white rounded-full" />
+                <img
+                    src={defaultUserIcon}
+                    alt="avatar"
+                    width={40}
+                    height={40}
+                    className="bg-white rounded-full"
+                />
             </Menu.Button>
             <Transition
                 as={Fragment}
@@ -39,16 +64,16 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                 leaveTo="transform opacity-0 scale-95"
             >
                 <Menu.Items className="absolute right-0 mt-2 w-max origin-top-right px-4 py-3 bg-blue-200 border-2 border-black/10  rounded-md flex flex-col">
-                    {userData.isUserLoggedIn ? (
+                    {isUserLoggedIn ? (
                         <>
                             <Menu.Item>
                                 {() => (
                                     <div className="flex flex-col border-b-2 border-b-black/20 pb-3 mb-3">
                                         <span className="inline-block font-normal truncate text-base">
-                                            {userData.name}
+                                            {authData?.fullname}
                                         </span>
                                         <span className="inline-block font-normal truncate text-base">
-                                            {userData.email}
+                                            {authData?.email}
                                         </span>
                                     </div>
                                 )}
@@ -61,7 +86,9 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                                                 to="/all-posts"
                                                 className={({ isActive }) =>
                                                     `w-full block p-2 border border-blue-500 hover:bg-blue-500 text-center rounded-md text-base transition-colors duration-200 ease-in disabled:cursor-not-allowed ${
-                                                        isActive ? "bg-blue-600 font-medium text-blue-950" : ""
+                                                        isActive
+                                                            ? "bg-blue-600 font-medium text-blue-950"
+                                                            : ""
                                                     }
                                         `
                                                 }
@@ -76,7 +103,9 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                                                 to="/add-post"
                                                 className={({ isActive }) =>
                                                     `w-full block p-2 border border-blue-500 hover:bg-blue-500 text-center rounded-md text-base transition-colors duration-200 ease-in disabled:cursor-not-allowed ${
-                                                        isActive ? "bg-blue-600 font-medium text-blue-950" : ""
+                                                        isActive
+                                                            ? "bg-blue-600 font-medium text-blue-950"
+                                                            : ""
                                                     }
                                         `
                                                 }
@@ -90,7 +119,7 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                             <Menu.Item>
                                 {({ active }) => (
                                     <button
-                                        disabled={userData.authStatus === "loading"}
+                                        // disabled={userData.authStatus === "loading"}
                                         onClick={handleLogout}
                                         className={`w-full p-2 border border-blue-500 rounded-md text-base transition-colors duration-200 ease-in disabled:cursor-not-allowed ${
                                             active && "bg-blue-500"
@@ -103,7 +132,13 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                         </>
                     ) : (
                         <>
-                            <Menu.Item>{() => <div className="inline-block">You are not logged in!</div>}</Menu.Item>
+                            <Menu.Item>
+                                {() => (
+                                    <div className="inline-block">
+                                        You are not logged in!
+                                    </div>
+                                )}
+                            </Menu.Item>
                             {!showLink ? (
                                 <div className=" w-full flex flex-col gap-3 border-t-2 border-t-black/20 pt-3 mt-2">
                                     <Menu.Item>
@@ -112,7 +147,9 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                                                 to="/signin"
                                                 className={({ isActive }) =>
                                                     `w-full block p-2 border border-blue-500 hover:bg-blue-500 text-center rounded-md text-base transition-colors duration-200 ease-in disabled:cursor-not-allowed ${
-                                                        isActive ? "bg-blue-600 font-medium text-blue-950" : ""
+                                                        isActive
+                                                            ? "bg-blue-600 font-medium text-blue-950"
+                                                            : ""
                                                     }
                                         `
                                                 }
@@ -127,7 +164,9 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                                                 to="/signup"
                                                 className={({ isActive }) =>
                                                     `w-full block p-2 border border-blue-500 hover:bg-blue-500 text-center rounded-md text-base transition-colors duration-200 ease-in disabled:cursor-not-allowed ${
-                                                        isActive ? "bg-blue-600 font-medium text-blue-950" : ""
+                                                        isActive
+                                                            ? "bg-blue-600 font-medium text-blue-950"
+                                                            : ""
                                                     }
                                         `
                                                 }

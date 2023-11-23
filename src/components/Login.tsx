@@ -122,9 +122,9 @@ const Login: React.FC = () => {
                                             } password`}
                                         >
                                             {passwordType === "password" ? (
-                                                <LuEye />
-                                            ) : (
                                                 <LuEyeOff />
+                                            ) : (
+                                                <LuEye />
                                             )}
                                         </div>
                                     )}

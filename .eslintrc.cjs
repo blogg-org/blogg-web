@@ -31,7 +31,10 @@ module.exports = {
     parser: "@typescript-eslint/parser",
     plugins: ["react-refresh", "@typescript-eslint"],
     rules: {
-        "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+        "react-refresh/only-export-components": [
+            "warn",
+            { allowConstantExport: true },
+        ],
     },
     settings: {
         react: {
@@ -47,5 +50,11 @@ module.exports = {
         ],
         "@typescript-eslint/prefer-nullish-coalescing": "error",
         "@typescript-eslint/no-unsafe-call": "error",
+        "@typescript-eslint/no-floating-promises": [
+            "error",
+            {
+                ignoreIIFE: true,
+            },
+        ],
     },
 };

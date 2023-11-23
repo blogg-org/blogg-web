@@ -1,6 +1,11 @@
 import { envConfig } from "./env.config";
-import { IAxiosError, IAxiosResponseData } from "src/types/axios.types";
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import { IAxiosError } from "src/types/axios.types";
+import axios, {
+    AxiosError,
+    AxiosInstance,
+    AxiosResponse,
+    InternalAxiosRequestConfig,
+} from "axios";
 
 const axiosInstance: AxiosInstance = axios.create({
     baseURL: envConfig.backendBaseURI,
@@ -8,6 +13,7 @@ const axiosInstance: AxiosInstance = axios.create({
     headers: {
         "Content-Type": "application/json",
     },
+    withCredentials: true,
 });
 
 // Add request interceptor to handle token or authentication headers
@@ -15,10 +21,10 @@ axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         // customise request config here
         // add authentication headers
-        // const token = getToken();
-        // if (token) {
-        //   config.headers['Authorization'] = `Bearer ${token}`;
-        // }s
+        const accessToken = localStorage.getItem("access_token");
+        if (accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`;
+        }
         console.log(config);
         return config;
     },
@@ -27,14 +33,18 @@ axiosInstance.interceptors.request.use(
 
 // Add response interceptor for better error handling
 axiosInstance.interceptors.response.use(
-    (response: AxiosResponse<IAxiosResponseData, AxiosRequestConfig>) => {
+    (response: AxiosResponse) => {
         console.log("\n:: response interceptor => response: ", response);
         return response;
     },
     (error: AxiosError<IAxiosError>): Promise<string> => {
         console.log("\n:: Error: ", error);
         if (error.response) {
-            console.error("\n:: HTTP Error: ", error.response.status, error.response.data);
+            console.error(
+                "\n:: HTTP Error: ",
+                error.response.status,
+                error.response.data
+            );
             error.message = error.response.data.message;
         } else if (error.request) {
             // Handle network-related errors (e.g., no internet connection)

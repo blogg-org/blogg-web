@@ -1,9 +1,13 @@
 import { IUserData } from "./auth.types";
 
+export interface IAccessToken {
+    accessToken: string;
+}
+
 export interface IAxiosResponseData {
     statusCode: number;
     message: string;
-    data: IUserData;
+    data: IUserData | IAccessToken;
     success: boolean;
 }
 
