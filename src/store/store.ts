@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slice/authSlice";
+import postsReducer from "./slice/blogsSlice";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 const store = configureStore({
     reducer: {
         auth: authReducer,
+        posts: postsReducer,
     },
 });
 
@@ -15,6 +17,7 @@ type AppDispatch = typeof store.dispatch;
 export const useAppDispatch: () => AppDispatch = useDispatch;
 
 // custom selector hook
-export const useAppSelector: TypedUseSelectorHook<typeof rootState> = useSelector;
+export const useAppSelector: TypedUseSelectorHook<typeof rootState> =
+    useSelector;
 
 export default store;

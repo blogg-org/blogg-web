@@ -9,6 +9,8 @@ import Avatar from "./Header/Avatar";
 import AuthLayout from "./AuthLayout";
 import Container from "./Container/Container";
 import ErrorInputMessage from "./ErrorInputMessage";
+import Posts from "./Posts";
+import PostCard from "./PostCard";
 
 export {
     Container,
@@ -22,4 +24,6 @@ export {
     Input,
     Signup,
     ErrorInputMessage,
+    Posts,
+    PostCard,
 };
