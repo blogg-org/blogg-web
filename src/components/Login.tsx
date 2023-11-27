@@ -10,7 +10,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { signinSchema } from "@form-validations/signin.schema";
 import { Button, ErrorInputMessage, Input, Logo } from "@components/index";
 
-``;
 const Login: React.FC = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();

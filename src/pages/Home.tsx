@@ -1,7 +1,12 @@
+import { Container, Posts } from "@components/index";
 import React from "react";
 
 const Home: React.FC = () => {
-    return <div className=" font-bold text-2xl text-center">Home</div>;
+    return (
+        <Container>
+            <Posts />
+        </Container>
+    );
 };
 
 export default Home;

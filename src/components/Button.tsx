@@ -15,7 +15,7 @@ const Button: React.FC<ButtonProps> = ({
     textColor = "text-white",
     className = "",
     ...props
-}) => {
+}: ButtonProps) => {
     return (
         <button
             type={type}
