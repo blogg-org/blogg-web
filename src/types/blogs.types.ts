@@ -13,3 +13,16 @@ export interface IInitialStatePostsSlice {
     data: IPostFromDB[];
     error: string;
 }
+
+export interface IPostFormData {
+    title: string;
+    slug: string;
+    content: string;
+    featuredImage: FileList;
+    status: "active" | "inactive";
+}
+
+export interface IUpdatePostArgs {
+    oldPost: IPostFromDB;
+    data: IPostFormData;
+}

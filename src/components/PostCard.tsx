@@ -1,18 +1,21 @@
 import { Link } from "react-router-dom";
 
 interface PostCardProps {
-    id: string;
+    slug: string;
     title: string;
     featuredImage: string;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
-    id,
+    slug,
     title,
     featuredImage,
 }: PostCardProps) => {
     return (
-        <Link to={`/post/${id}`} className="inline-flex justify-center w-full">
+        <Link
+            to={`/posts/${slug}`}
+            className="inline-flex justify-center w-full"
+        >
             <div className="group border-2 border-blue-100 w-full min-w-[300px] max-w-lg h-96 rounded-md hover:bg-blue-100 hover:border-blue-200 transition-all duration-200 ease-in">
                 <div className="h-3/4">
                     <div className="h-full w-full relative overflow-hidden rounded-t-md">
@@ -20,7 +23,7 @@ const PostCard: React.FC<PostCardProps> = ({
                             style={{
                                 backgroundImage: `url(${featuredImage})`,
                             }}
-                            className="block absolute inset-0 bg-cover bg-center bg-no-repeat scale-100 group-hover:scale-105 transition-transform duration-200 ease-in"
+                            className="block absolute inset-0 bg-cover bg-center bg-no-repeat bg-white scale-100 group-hover:scale-105 transition-transform duration-200 ease-in"
                         ></div>
                     </div>
                 </div>

@@ -1,8 +1,8 @@
+import { useAppSelector } from "@store/store";
 import { Link, NavLink } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { Container, Logo, Avatar } from "@components/index";
-import { useAppSelector } from "@store/store";
 import { getLoginStatus } from "@store/slice/authSlice";
+import { Container, Logo, Avatar } from "@components/index";
 
 const Header: React.FC = () => {
     // const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
@@ -50,13 +50,13 @@ const Header: React.FC = () => {
         },
         {
             name: "All Posts",
-            slug: "/all-posts",
+            slug: "/posts",
             active: isUserLoggedIn,
             show: showLink,
         },
         {
             name: "Add Post",
-            slug: "/add-post",
+            slug: "/posts/add",
             active: isUserLoggedIn,
             show: showLink,
         },
@@ -77,6 +77,7 @@ const Header: React.FC = () => {
                                     <li key={item.name}>
                                         <NavLink
                                             to={item.slug}
+                                            end
                                             className={({ isActive }) =>
                                                 `h-full px-4 flex justify-center items-center hover:bg-blue-300 transition-colors duration-200 ease-in
                                             ${

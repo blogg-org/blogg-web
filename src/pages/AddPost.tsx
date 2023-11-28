@@ -1,7 +1,11 @@
 import React from "react";
+import { PostForm } from "@components/index";
+import { useDocumentTitle } from "@hooks/useDocumentTitle";
 
 const AddPost: React.FC = () => {
-    return <div>AddPost</div>;
+    useDocumentTitle("blogg - Add Post");
+
+    return <PostForm />;
 };
 
 export default AddPost;

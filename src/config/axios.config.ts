@@ -9,7 +9,7 @@ import axios, {
 
 const axiosInstance: AxiosInstance = axios.create({
     baseURL: envConfig.backendBaseURI,
-    timeout: 5000,
+    timeout: 10000,
     headers: {
         "Content-Type": "application/json",
     },
@@ -25,7 +25,6 @@ axiosInstance.interceptors.request.use(
         if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
-        console.log(config);
         return config;
     },
     (error: AxiosError): Promise<AxiosError> => Promise.reject(error)
@@ -40,11 +39,12 @@ axiosInstance.interceptors.response.use(
     (error: AxiosError<IAxiosError>): Promise<string> => {
         console.log("\n:: Error: ", error);
         if (error.response) {
-            console.error(
-                "\n:: HTTP Error: ",
-                error.response.status,
-                error.response.data
-            );
+            if (
+                error.response.status === 401 ||
+                error.response.status === 403
+            ) {
+                localStorage.setItem("isLoggedIn", "false");
+            }
             error.message = error.response.data.message;
         } else if (error.request) {
             // Handle network-related errors (e.g., no internet connection)
