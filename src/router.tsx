@@ -1,7 +1,19 @@
 import App from "./App";
 import { AuthLayout } from "@components/index";
-import { AddPost, AllPosts, EditPost, Home, Login, Post, Signup } from "@pages/index";
-import { Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
+import {
+    AddPost,
+    AllPosts,
+    EditPost,
+    Home,
+    Login,
+    Post,
+    Signup,
+} from "@pages/index";
+import {
+    Route,
+    createBrowserRouter,
+    createRoutesFromElements,
+} from "react-router-dom";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -24,7 +36,7 @@ const router = createBrowserRouter(
                 }
             />
             <Route
-                path="all-posts"
+                path="posts"
                 element={
                     <AuthLayout authentication={true}>
                         <AllPosts />
@@ -32,7 +44,7 @@ const router = createBrowserRouter(
                 }
             />
             <Route
-                path="add-post"
+                path="posts/add"
                 element={
                     <AuthLayout authentication={true}>
                         <AddPost />
@@ -40,14 +52,14 @@ const router = createBrowserRouter(
                 }
             />
             <Route
-                path="edit-post/:slug"
+                path="posts/edit/:slug"
                 element={
                     <AuthLayout authentication={true}>
                         <EditPost />
                     </AuthLayout>
                 }
             />
-            <Route path="post/:slug" element={<Post />} />
+            <Route path="posts/:slug" element={<Post />} />
         </Route>
     )
 );
