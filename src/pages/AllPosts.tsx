@@ -4,6 +4,7 @@ import { useDocumentTitle } from "@hooks/useDocumentTitle";
 
 const AllPosts: React.FC = () => {
     useDocumentTitle("blogg - All Posts");
+
     return <Posts />;
 };
 

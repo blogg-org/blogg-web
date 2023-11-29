@@ -1,7 +1,8 @@
+import toast from "react-hot-toast";
+import { NavLink } from "react-router-dom";
 import React, { Fragment, useEffect } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import defaultUserIcon from "@assets/user-alien.svg";
-import { NavLink, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@store/store";
 import {
     currentUser,
@@ -9,7 +10,6 @@ import {
     getLoginStatus,
     signout,
 } from "@store/slice/authSlice";
-import toast from "react-hot-toast";
 
 interface AvatarProps {
     showLink: boolean;
@@ -17,15 +17,13 @@ interface AvatarProps {
 
 const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-    const isUserLoggedIn = useAppSelector(getLoginStatus) === "true";
+    const isSignedIn = useAppSelector(getLoginStatus) === "true";
     const authData = useAppSelector(getAuthData);
 
     const handleLogout = async () => {
         const response = await dispatch(signout());
         if (response && response.meta.requestStatus === "fulfilled") {
             toast.success(response.payload as string, { duration: 5000 });
-            navigate("/");
         } else if (response && response.meta.requestStatus === "rejected") {
             toast.error(response.payload as string, { duration: 5000 });
         }
@@ -34,11 +32,11 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
     useEffect(() => {
         // IIFE (immediately invoked function expression)
         (async () => {
-            if (isUserLoggedIn) {
+            if (isSignedIn) {
                 await dispatch(currentUser());
             }
         })();
-    }, [isUserLoggedIn, dispatch]);
+    }, [isSignedIn, dispatch]);
 
     return (
         <Menu as="div" className="group relative z-50">
@@ -64,7 +62,7 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                 leaveTo="transform opacity-0 scale-95"
             >
                 <Menu.Items className="absolute right-0 mt-2 w-max origin-top-right px-4 py-3 bg-blue-200 border-2 border-black/10  rounded-md flex flex-col">
-                    {isUserLoggedIn ? (
+                    {isSignedIn ? (
                         <>
                             <Menu.Item>
                                 {() => (

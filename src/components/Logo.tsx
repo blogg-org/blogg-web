@@ -13,7 +13,10 @@ const Logo: React.FC<LogoProps> = ({ className = "" }) => {
             viewBox="0 0 330.000000 260.000000"
             preserveAspectRatio="xMidYMid meet"
         >
-            <g transform="translate(0.000000,260.000000) scale(0.100000,-0.100000)" stroke="none">
+            <g
+                transform="translate(0.000000,260.000000) scale(0.100000,-0.100000)"
+                stroke="none"
+            >
                 <path
                     d="M1522 2365 c-75 -21 -233 -119 -304 -189 -67 -67 -114 -141 -123
 -198 -15 -86 61 -227 163 -302 61 -44 88 -53 209 -67 88 -10 160 -6 321 18 42

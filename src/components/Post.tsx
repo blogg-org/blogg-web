@@ -29,7 +29,7 @@ const Post: React.FC = () => {
     const handleDelete = async () => {
         try {
             const response = await dispatch(deletePost(post?._id ?? ""));
-            // console.log("\n:: PostForm.tsx => response: ", response);
+
             if (response && response.meta.requestStatus === "fulfilled") {
                 toast.success("Blog deleted successfully.", {
                     duration: 5000,
@@ -55,7 +55,7 @@ const Post: React.FC = () => {
 
                     {isAuthor && (
                         <div className="absolute right-6 top-6">
-                            <Link to={`/posts/edit/${post.slug}`}>
+                            <Link to={`/posts/${post.slug}/edit`}>
                                 <Button
                                     bgColor="bg-green-600"
                                     className="mr-3 hover:bg-green-700"

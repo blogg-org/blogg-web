@@ -15,10 +15,9 @@ export const handleSignupApi = async (
             `/api/v1/auth/signup`,
             data
         );
-        // console.log("\n:: users.api => response: ", response);
+
         return await response.data;
     } catch (error) {
-        // console.log("\n:: Error => users.api => handleSignupApi: ", error);
         throw error as string;
     }
 };
@@ -32,13 +31,12 @@ export const handleSigninApi = async (
             `/api/v1/auth/signin`,
             data
         );
-        // console.log(
+
         //     "\n:: users.api => handleSigninApi => response.data: ",
         //     response.data
         // );
         return await response.data;
     } catch (error) {
-        // console.log("\n:: Error => users.api => handleSigninApi: ", error);
         throw error as string;
     }
 };
@@ -51,7 +49,7 @@ export const handleGetCurrentUserApi = async (): Promise<IUserData> => {
         >("/api/v1/auth/refresh");
         const refreshResponseData = (await refreshResponse.data)
             .data as IAccessToken;
-        // console.log(
+
         //     "\n:: handleGetCurrentUserApi => token: ",
         //     refreshResponseData.accessToken
         // );
@@ -64,7 +62,6 @@ export const handleGetCurrentUserApi = async (): Promise<IUserData> => {
             .data as IUserData;
         return currentUserResponseData;
     } catch (error) {
-        // console.log(
         //     "\n:: Error => users.api => handleGetCurrentUserApi: ",
         //     error
         // );
@@ -80,7 +77,7 @@ export const handleSignoutApi = async () => {
         >("/api/v1/auth/refresh");
         const refreshResponseData = (await refreshResponse.data)
             .data as IAccessToken;
-        // console.log(
+
         //     "\n:: handleGetCurrentUserApi => token: ",
         //     refreshResponseData.accessToken
         // );
@@ -91,7 +88,6 @@ export const handleSignoutApi = async () => {
         >("/api/v1/auth/signout");
         return await signoutResponse.data;
     } catch (error) {
-        // console.log("\n:: Error => users.api => handleSignout: ", error);
         throw error as string;
     }
 };

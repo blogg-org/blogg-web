@@ -29,11 +29,9 @@ export const createNewPost = createAsyncThunk(
     "posts/create",
     async (data: IPostFormData, { rejectWithValue }) => {
         try {
-            // console.log("\n:: blogSlice => createNewPost => data: ", data);
             const response = await handleCreateNewPostApi(data);
             return response;
         } catch (error) {
-            // console.log("\n:: Error => blogsSlice => createNewPost: ", error);
             return rejectWithValue(error ?? "Error occured while publishing");
         }
     }
@@ -47,7 +45,6 @@ export const updatePost = createAsyncThunk(
             const response = await handleUpdatePostApi({ oldPost, data });
             return response;
         } catch (error) {
-            // console.log("\n:: Error => blogsSlice => createNewPost: ", error);
             return rejectWithValue(error ?? "Error occured while updating");
         }
     }
@@ -61,7 +58,6 @@ export const deletePost = createAsyncThunk(
             const response = await handleDeletePostApi(blogId);
             return response;
         } catch (error) {
-            // console.log("\n:: Error => blogsSlice => createNewPost: ", error);
             return rejectWithValue(error ?? "Error occured while deleting");
         }
     }

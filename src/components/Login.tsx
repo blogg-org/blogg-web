@@ -1,9 +1,9 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 import { useAppDispatch } from "@store/store";
 import { signin } from "@store/slice/authSlice";
 import { LuEye, LuEyeOff } from "react-icons/lu";
-import { Link, useNavigate } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { ISigninPayload } from "src/types/auth.types";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -12,7 +12,6 @@ import { Button, ErrorInputMessage, Input, Logo } from "@components/index";
 
 const Login: React.FC = () => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { control, handleSubmit } = useForm<ISigninPayload>({
         resolver: yupResolver(signinSchema),
@@ -34,7 +33,6 @@ const Login: React.FC = () => {
             console.log("\n:: Login.tsx => response: ", response);
             if (response && response.meta.requestStatus === "fulfilled") {
                 toast.success(response.payload as string, { duration: 5000 });
-                navigate("/");
             } else if (response && response.meta.requestStatus === "rejected") {
                 toast.error(response.payload as string, { duration: 5000 });
             }
@@ -44,6 +42,7 @@ const Login: React.FC = () => {
             setIsLoading(false);
         }
     };
+
     return (
         <div className="flex items-center justify-center w-full">
             <div

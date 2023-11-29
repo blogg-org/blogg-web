@@ -14,9 +14,9 @@ const PostCard: React.FC<PostCardProps> = ({
     return (
         <Link
             to={`/posts/${slug}`}
-            className="inline-flex justify-center w-full"
+            className="inline-flex justify-center w-full "
         >
-            <div className="group border-2 border-blue-100 w-full min-w-[300px] max-w-lg h-96 rounded-md hover:bg-blue-100 hover:border-blue-200 transition-all duration-200 ease-in">
+            <div className="group border-2 border-blue-100 w-full min-w-[300px] max-w-lg h-96 rounded-md bg-blue-50 hover:bg-blue-100 hover:border-blue-200 transition-all duration-200 ease-in">
                 <div className="h-3/4">
                     <div className="h-full w-full relative overflow-hidden rounded-t-md">
                         <div
