@@ -73,7 +73,6 @@ export const handleUpdatePostApi = async ({
     data,
 }: IUpdatePostArgs) => {
     try {
-        // console.log()
         const refreshResponse = await axiosInstance.get<
             AxiosResponse<Promise<IAccessToken>>
         >("/api/v1/auth/refresh");

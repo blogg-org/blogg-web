@@ -39,10 +39,9 @@ export const signup = createAsyncThunk(
     async (data: ISignupPayload, { rejectWithValue }) => {
         try {
             const response = await handleSignupApi(data);
-            // console.log("\n:: authSlice => response: ", response);
+
             return response.message;
         } catch (error) {
-            // console.log("\n:: Error => authSlice => signup: ", error);
             return rejectWithValue(error);
         }
     }
@@ -54,13 +53,12 @@ export const signin = createAsyncThunk(
     async (data: ISigninPayload, { rejectWithValue }) => {
         try {
             const response = await handleSigninApi(data);
-            // console.log("\n:: authSlice => response: ", response);
+
             const resData = response.data as IAccessToken;
             localStorage.setItem("access_token", resData.accessToken);
             localStorage.setItem("isLoggedIn", "true");
             return response.message;
         } catch (error) {
-            // console.log("\n:: Error => authSlice => signin: ", error);
             return rejectWithValue(error);
         }
     }

@@ -1,8 +1,9 @@
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
-import { useAppDispatch } from "@store/store";
 import { useNavigate } from "react-router-dom";
+import { getAuthData } from "@store/slice/authSlice";
 import { useDocumentTitle } from "@hooks/useDocumentTitle";
+import { useAppDispatch, useAppSelector } from "@store/store";
 import React, { useCallback, useEffect, useState } from "react";
 import { IPostFormData, IPostFromDB } from "src/types/blogs.types";
 import { createNewPost, updatePost } from "@store/slice/blogsSlice";
@@ -28,14 +29,23 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const user = useAppSelector(getAuthData);
+
+    const isAuthor = post && user ? post.author === user._id : false;
+
+    useEffect(() => {
+        if (post && !isAuthor) {
+            navigate(`/posts/${post.slug}`);
+        }
+    }, [post, isAuthor, navigate]);
 
     const submitPost = async (data: IPostFormData) => {
         setIsLoading(true);
-        // console.log("\n:: PostForm.tsx => submitPost => data: ", data);
+
         try {
             if (!post) {
                 const response = await dispatch(createNewPost(data));
-                // console.log("\n:: PostForm.tsx => response: ", response);
+
                 if (response && response.meta.requestStatus === "fulfilled") {
                     toast.success("Blog created successfully.", {
                         duration: 5000,
@@ -52,7 +62,7 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
             const response = await dispatch(
                 updatePost({ oldPost: post!, data })
             );
-            // console.log("\n:: PostForm.tsx => response: ", response);
+
             if (response && response.meta.requestStatus === "fulfilled") {
                 toast.success("Blog updated successfully.", {
                     duration: 5000,

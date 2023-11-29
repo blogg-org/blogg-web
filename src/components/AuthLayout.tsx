@@ -1,19 +1,26 @@
+import { useEffect } from "react";
+import { useAppSelector } from "@store/store";
+import { getLoginStatus } from "@store/slice/authSlice";
+import { useLocation, useNavigate } from "react-router-dom";
+
 interface AuthLayoutProps {
     children: React.ReactNode;
-    authentication?: boolean;
+    isAuthor?: boolean;
 }
 
-const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
-    // const navigate = useNavigate();
-    // const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+const AuthLayout: React.FC<AuthLayoutProps> = ({
+    children,
+}: AuthLayoutProps) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const isSignedIn = useAppSelector(getLoginStatus);
 
-    // useEffect(() => {
-    //     if (authentication && isUserLoggedIn !== authentication) {
-    //         navigate("/login");
-    //     } else if (!authentication && isUserLoggedIn !== authentication) {
-    //         navigate("/");
-    //     }
-    // }, [authentication, isUserLoggedIn, navigate]);
+    useEffect(() => {
+        if (isSignedIn !== "true") {
+            navigate("/signin", { state: { from: location.pathname } });
+        }
+    }, [navigate, isSignedIn, location.pathname]);
+
     return <>{children}</>;
 };
 

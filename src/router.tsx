@@ -1,44 +1,30 @@
-import App from "./App";
-import { AuthLayout } from "@components/index";
 import {
+    Home,
+    Post,
+    Login,
+    Signup,
     AddPost,
     AllPosts,
     EditPost,
-    Home,
-    Login,
-    Post,
-    Signup,
 } from "@pages/index";
 import {
     Route,
     createBrowserRouter,
     createRoutesFromElements,
 } from "react-router-dom";
+import App from "./App";
+import { AuthLayout } from "@components/index";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<App />}>
             <Route path="" element={<Home />} />
-            <Route
-                path="signin"
-                element={
-                    <AuthLayout authentication={false}>
-                        <Login />
-                    </AuthLayout>
-                }
-            />
-            <Route
-                path="signup"
-                element={
-                    <AuthLayout authentication={false}>
-                        <Signup />
-                    </AuthLayout>
-                }
-            />
+            <Route path="signin" element={<Login />} />
+            <Route path="signup" element={<Signup />} />
             <Route
                 path="posts"
                 element={
-                    <AuthLayout authentication={true}>
+                    <AuthLayout>
                         <AllPosts />
                     </AuthLayout>
                 }
@@ -46,20 +32,27 @@ const router = createBrowserRouter(
             <Route
                 path="posts/add"
                 element={
-                    <AuthLayout authentication={true}>
+                    <AuthLayout>
                         <AddPost />
                     </AuthLayout>
                 }
             />
             <Route
-                path="posts/edit/:slug"
+                path="posts/:slug/edit"
                 element={
-                    <AuthLayout authentication={true}>
+                    <AuthLayout>
                         <EditPost />
                     </AuthLayout>
                 }
             />
-            <Route path="posts/:slug" element={<Post />} />
+            <Route
+                path="posts/:slug"
+                element={
+                    <AuthLayout>
+                        <Post />
+                    </AuthLayout>
+                }
+            />
         </Route>
     )
 );
