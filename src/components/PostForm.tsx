@@ -43,7 +43,23 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
         setIsLoading(true);
 
         try {
-            if (!post) {
+            if (post) {
+                const response = await dispatch(
+                    updatePost({ oldPost: post, data })
+                );
+
+                if (response && response.meta.requestStatus === "fulfilled") {
+                    toast.success("Blog updated successfully.", {
+                        duration: 5000,
+                    });
+                    navigate(`/posts/${data.slug}`);
+                } else if (
+                    response &&
+                    response.meta.requestStatus === "rejected"
+                ) {
+                    toast.error(response.payload as string, { duration: 5000 });
+                }
+            } else {
                 const response = await dispatch(createNewPost(data));
 
                 if (response && response.meta.requestStatus === "fulfilled") {
@@ -55,21 +71,10 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
                     response &&
                     response.meta.requestStatus === "rejected"
                 ) {
-                    toast.error(response.payload as string, { duration: 5000 });
+                    toast.error(response.payload as string, {
+                        duration: 5000,
+                    });
                 }
-            }
-
-            const response = await dispatch(
-                updatePost({ oldPost: post!, data })
-            );
-
-            if (response && response.meta.requestStatus === "fulfilled") {
-                toast.success("Blog updated successfully.", {
-                    duration: 5000,
-                });
-                navigate(`/posts/${data.slug}`);
-            } else if (response && response.meta.requestStatus === "rejected") {
-                toast.error(response.payload as string, { duration: 5000 });
             }
         } catch (error) {
             console.log("\n:: Signup.tsx => Error: ", error);
@@ -173,7 +178,7 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
                 {post && (
                     <div className="w-full mb-4">
                         <img
-                            src={post.featuredImage}
+                            src={post.featuredImage.url}
                             alt={post.title}
                             className="rounded-lg"
                         />

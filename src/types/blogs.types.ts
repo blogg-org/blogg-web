@@ -3,7 +3,11 @@ export interface IPostFromDB {
     title: string;
     slug: string;
     content: string;
-    featuredImage: string;
+    featuredImage: {
+        _id: string;
+        publicId: string;
+        url: string;
+    };
     status: "active" | "inactive";
     author: string;
 }

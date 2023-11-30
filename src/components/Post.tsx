@@ -48,7 +48,7 @@ const Post: React.FC = () => {
             <div className="py-8">
                 <div className="w-full flex justify-center mb-4 relative border rounded-xl p-2">
                     <img
-                        src={post.featuredImage}
+                        src={post.featuredImage.url}
                         alt={post.title}
                         className="rounded-xl"
                     />
