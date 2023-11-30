@@ -30,7 +30,6 @@ const Login: React.FC = () => {
         try {
             setIsLoading(true);
             const response = await dispatch(signin(data));
-            console.log("\n:: Login.tsx => response: ", response);
             if (response && response.meta.requestStatus === "fulfilled") {
                 toast.success(response.payload as string, { duration: 5000 });
             } else if (response && response.meta.requestStatus === "rejected") {

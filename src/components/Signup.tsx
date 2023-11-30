@@ -33,11 +33,9 @@ const Signup: React.FC = () => {
     };
 
     const handleSignup = async (data: ISignupPayload) => {
-        console.log(data);
         try {
             setIsLoading(true);
             const response = await dispatch(signup(data));
-            console.log("\n:: Signup.tsx => response: ", response);
             if (response && response.meta.requestStatus === "fulfilled") {
                 toast.success(response.payload as string, { duration: 5000 });
                 navigate("/signin");

@@ -22,7 +22,7 @@ const Posts: React.FC = () => {
                             <PostCard
                                 slug={post.slug}
                                 title={post.title}
-                                featuredImage={post.featuredImage}
+                                featuredImage={post.featuredImage.url}
                             />
                         </div>
                     ))}
