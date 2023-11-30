@@ -9,6 +9,11 @@ export interface ISigninPayload {
     password: string;
 }
 
+export interface IChangePasswordPayload {
+    oldPassword: string;
+    newPassword: string;
+}
+
 export interface IUserData {
     _id: string;
     fullname: string;

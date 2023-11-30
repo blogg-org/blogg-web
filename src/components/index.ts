@@ -15,6 +15,7 @@ import AuthLayout from "./AuthLayout";
 import Container from "./Container/Container";
 import RealTimeEditor from "./RealTimeEditor";
 import ErrorInputMessage from "./ErrorInputMessage";
+import ChangePassword from "./forms/ChangePassword";
 
 export {
     Logo,
@@ -34,4 +35,5 @@ export {
     AuthLayout,
     RealTimeEditor,
     ErrorInputMessage,
+    ChangePassword,
 };

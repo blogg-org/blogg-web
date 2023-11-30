@@ -2,9 +2,11 @@ import {
     IUserData,
     ISigninPayload,
     ISignupPayload,
+    IChangePasswordPayload,
 } from "src/types/auth.types";
 import axiosInstance from "@config/axios.config";
 import { IAccessToken, IAxiosResponseData } from "src/types/axios.types";
+import { AxiosResponse } from "axios";
 
 // handle signup
 export const handleSignupApi = async (
@@ -78,15 +80,34 @@ export const handleSignoutApi = async () => {
         const refreshResponseData = (await refreshResponse.data)
             .data as IAccessToken;
 
-        //     "\n:: handleGetCurrentUserApi => token: ",
-        //     refreshResponseData.accessToken
-        // );
         localStorage.setItem("access_token", refreshResponseData.accessToken);
 
         const signoutResponse = await axiosInstance.post<
             Promise<IAxiosResponseData>
         >("/api/v1/auth/signout");
         return await signoutResponse.data;
+    } catch (error) {
+        throw error as string;
+    }
+};
+
+// handle change password
+export const handleChangePasswordApi = async (data: IChangePasswordPayload) => {
+    try {
+        const refreshResponse = await axiosInstance.get<
+            AxiosResponse<Promise<IAccessToken>>
+        >("/api/v1/auth/refresh");
+        const refreshResponseData = await refreshResponse.data.data;
+        localStorage.setItem("access_token", refreshResponseData.accessToken);
+
+        const changePasswordApiResponse = await axiosInstance.put<
+            Promise<IAxiosResponseData>
+        >("/api/v1/auth/change-password", data);
+        console.log(
+            "\n:: handleChangePasswordApi => changePasswordApiResponse: ",
+            changePasswordApiResponse
+        );
+        return await changePasswordApiResponse.data;
     } catch (error) {
         throw error as string;
     }

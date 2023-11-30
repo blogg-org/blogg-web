@@ -6,6 +6,7 @@ import {
     AddPost,
     AllPosts,
     EditPost,
+    ChangePassword,
 } from "@pages/index";
 import {
     Route,
@@ -21,6 +22,14 @@ const router = createBrowserRouter(
             <Route path="" element={<Home />} />
             <Route path="signin" element={<Login />} />
             <Route path="signup" element={<Signup />} />
+            <Route
+                path="auth/change-password"
+                element={
+                    <AuthLayout>
+                        <ChangePassword />
+                    </AuthLayout>
+                }
+            />
             <Route
                 path="posts"
                 element={

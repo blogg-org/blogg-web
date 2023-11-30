@@ -1,15 +1,15 @@
+import {
+    signout,
+    currentUser,
+    getAuthData,
+    getLoginStatus,
+} from "@store/slice/authSlice";
 import toast from "react-hot-toast";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import React, { Fragment, useEffect } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import defaultUserIcon from "@assets/user-alien.svg";
 import { useAppDispatch, useAppSelector } from "@store/store";
-import {
-    currentUser,
-    getAuthData,
-    getLoginStatus,
-    signout,
-} from "@store/slice/authSlice";
 
 interface AvatarProps {
     showLink: boolean;
@@ -17,8 +17,13 @@ interface AvatarProps {
 
 const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const isSignedIn = useAppSelector(getLoginStatus) === "true";
     const authData = useAppSelector(getAuthData);
+
+    const handleChangePasswordButtonClick = () => {
+        navigate("/auth/change-password");
+    };
 
     const handleLogout = async () => {
         const response = await dispatch(signout());
@@ -114,10 +119,26 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                                     </Menu.Item>
                                 </div>
                             ) : null}
+                            {/* change password button */}
                             <Menu.Item>
                                 {({ active }) => (
                                     <button
-                                        // disabled={userData.authStatus === "loading"}
+                                        onClick={
+                                            handleChangePasswordButtonClick
+                                        }
+                                        className={`w-full p-2 border mb-3 border-blue-500 rounded-md text-base transition-colors duration-200 ease-in disabled:cursor-not-allowed ${
+                                            active && "bg-blue-500"
+                                        }`}
+                                    >
+                                        Change Password
+                                    </button>
+                                )}
+                            </Menu.Item>
+
+                            {/* sign out button */}
+                            <Menu.Item>
+                                {({ active }) => (
+                                    <button
                                         onClick={handleLogout}
                                         className={`w-full p-2 border border-blue-500 rounded-md text-base transition-colors duration-200 ease-in disabled:cursor-not-allowed ${
                                             active && "bg-blue-500"
