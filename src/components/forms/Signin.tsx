@@ -5,26 +5,21 @@ import {
     CustomLink,
     ErrorInputMessage,
 } from "@components/index";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAppDispatch } from "@store/store";
+import { signin } from "@store/slice/authSlice";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { useAuthToast } from "@hooks/useAuthToast";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { changePassword } from "@store/slice/authSlice";
-import { AuthStateStatus, IChangePasswordPayload } from "src/types/auth.types";
-import { changePasswordSchema } from "@form-validations/changePassword.schema";
+import { signinSchema } from "@form-validations/signin.schema";
+import { AuthStateStatus, ISigninPayload } from "src/types/auth.types";
 
-const ChangePassword: React.FC = () => {
+const Signin: React.FC = () => {
     const dispatch = useAppDispatch();
-    const [changePasswordStatus, setChangePasswordStatus] =
-        useState<AuthStateStatus>("idle");
-    const { control, handleSubmit } = useForm<IChangePasswordPayload>({
-        defaultValues: {
-            oldPassword: "",
-            newPassword: "",
-        },
-        resolver: yupResolver(changePasswordSchema),
+    const [signinStatus, setSigninStatus] = useState<AuthStateStatus>("idle");
+    const { control, handleSubmit } = useForm<ISigninPayload>({
+        resolver: yupResolver(signinSchema),
     });
     const [passwordType, setPasswordType] = useState<string>("password");
 
@@ -36,17 +31,19 @@ const ChangePassword: React.FC = () => {
         }
     };
 
-    const handleChangePassword = async (data: IChangePasswordPayload) => {
-        setChangePasswordStatus("loading");
-        const response = await dispatch(changePassword(data));
+    const handleLogin = async (data: ISigninPayload) => {
+        setSigninStatus("loading");
+        const response = await dispatch(signin(data));
         if (response && response.meta.requestStatus === "fulfilled") {
-            setChangePasswordStatus("succeeded");
+            setSigninStatus("succeeded");
         } else if (response && response.meta.requestStatus === "rejected") {
-            setChangePasswordStatus("failed");
+            setSigninStatus("failed");
+        } else {
+            setSigninStatus("idle");
         }
     };
 
-    useAuthToast(changePasswordStatus, "/");
+    useAuthToast(signinStatus);
 
     return (
         <div className="flex items-center justify-center w-full">
@@ -59,23 +56,47 @@ const ChangePassword: React.FC = () => {
                     </span>
                 </div>
                 <h2 className="text-center text-2xl font-bold leading-tight">
-                    Change Password
+                    Sign in to your account
                 </h2>
-
-                <form
-                    onSubmit={handleSubmit(handleChangePassword)}
-                    className="mt-8"
-                >
+                <p className="mt-2 text-center text-base text-black/60">
+                    Don&apos;t have any account?&nbsp;
+                    <CustomLink to="/auth/signup">Sign up</CustomLink>
+                </p>
+                <form onSubmit={handleSubmit(handleLogin)} className="mt-8">
                     <div className="space-y-5">
-                        {/* recent password */}
                         <Controller
-                            name="oldPassword"
+                            name="email"
                             control={control}
                             defaultValue=""
                             render={({ field, fieldState }) => (
                                 <div className="relative">
                                     <Input
-                                        label="Recent Password"
+                                        label="Email"
+                                        type="email"
+                                        placeholder="Enter your email"
+                                        className={`${
+                                            fieldState.error?.message
+                                                ? "border-red-800"
+                                                : ""
+                                        }`}
+                                        {...field}
+                                    />
+                                    {fieldState.error?.message && (
+                                        <ErrorInputMessage
+                                            message={fieldState.error.message}
+                                        />
+                                    )}
+                                </div>
+                            )}
+                        />
+                        <Controller
+                            name="password"
+                            control={control}
+                            defaultValue=""
+                            render={({ field, fieldState }) => (
+                                <div className="relative">
+                                    <Input
+                                        label="Password"
                                         type={passwordType}
                                         placeholder="Enter your password"
                                         className={`${
@@ -110,58 +131,14 @@ const ChangePassword: React.FC = () => {
                                 </div>
                             )}
                         />
-                        {/* new password */}
-                        <Controller
-                            name="newPassword"
-                            control={control}
-                            defaultValue=""
-                            render={({ field, fieldState }) => (
-                                <div className="relative">
-                                    <Input
-                                        label="New Password"
-                                        type={passwordType}
-                                        placeholder="Enter new password"
-                                        className={`${
-                                            fieldState.error?.message
-                                                ? "border-red-800"
-                                                : ""
-                                        }`}
-                                        {...field}
-                                    />
-                                    {field.value && (
-                                        <div
-                                            className="absolute top-12 -translate-y-1/2 right-3 hover:cursor-pointer scale-125"
-                                            onClick={showHidePassword}
-                                            title={`${
-                                                passwordType === "password"
-                                                    ? "show"
-                                                    : "hide"
-                                            } password`}
-                                        >
-                                            {passwordType === "password" ? (
-                                                <LuEyeOff />
-                                            ) : (
-                                                <LuEye />
-                                            )}
-                                        </div>
-                                    )}
-                                    {fieldState.error?.message && (
-                                        <ErrorInputMessage
-                                            message={fieldState.error.message}
-                                        />
-                                    )}
-                                </div>
-                            )}
-                        />
                         <Button
-                            disabled={changePasswordStatus === "loading"}
+                            disabled={signinStatus === "loading"}
                             type="submit"
-                            bgColor="bg-green-500"
-                            className="w-full hover:bg-green-600 disabled:bg-green-400"
+                            className="w-full hover:bg-blue-700 disabled:bg-blue-400"
                         >
-                            {changePasswordStatus === "loading"
-                                ? "Updating..."
-                                : "Update"}
+                            {signinStatus === "loading"
+                                ? "Signing in..."
+                                : "Sign in"}
                         </Button>
                     </div>
                 </form>
@@ -175,4 +152,4 @@ const ChangePassword: React.FC = () => {
     );
 };
 
-export default ChangePassword;
+export default Signin;

@@ -5,8 +5,7 @@ import { getLoginStatus } from "@store/slice/authSlice";
 import { Container, Logo, Avatar } from "@components/index";
 
 const Header: React.FC = () => {
-    // const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-    const isUserLoggedIn = useAppSelector(getLoginStatus) === "true";
+    const isSignedIn = useAppSelector(getLoginStatus) === "true";
     const [showLink, setShowLink] = useState(true);
 
     const checkWindowWidth = () => {
@@ -38,26 +37,26 @@ const Header: React.FC = () => {
         },
         {
             name: "Sign in",
-            slug: "/signin",
-            active: !isUserLoggedIn,
+            slug: "/auth/signin",
+            active: !isSignedIn,
             show: showLink,
         },
         {
             name: "Sign up",
-            slug: "/signup",
-            active: !isUserLoggedIn,
+            slug: "/auth/signup",
+            active: !isSignedIn,
             show: showLink,
         },
         {
             name: "All Posts",
             slug: "/posts",
-            active: isUserLoggedIn,
+            active: isSignedIn,
             show: showLink,
         },
         {
             name: "Add Post",
             slug: "/posts/add",
-            active: isUserLoggedIn,
+            active: isSignedIn,
             show: showLink,
         },
     ];

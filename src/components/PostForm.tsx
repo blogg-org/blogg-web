@@ -1,13 +1,14 @@
-import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { getAuthData } from "@store/slice/authSlice";
+import { AuthStateStatus } from "src/types/auth.types";
 import { useDocumentTitle } from "@hooks/useDocumentTitle";
 import { useAppDispatch, useAppSelector } from "@store/store";
 import React, { useCallback, useEffect, useState } from "react";
 import { IPostFormData, IPostFromDB } from "src/types/blogs.types";
 import { createNewPost, updatePost } from "@store/slice/blogsSlice";
 import { Button, Input, RealTimeEditor, Select } from "@components/index";
+import { usePostToast } from "@hooks/usePostToast";
 
 interface PostFormProps {
     post?: IPostFromDB;
@@ -15,6 +16,13 @@ interface PostFormProps {
 
 const PostForm: React.FC<PostFormProps> = ({ post }) => {
     useDocumentTitle("blogg - Edit");
+
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const user = useAppSelector(getAuthData);
+    const [postFormStatus, setPostFormStatus] =
+        useState<AuthStateStatus>("idle");
+    const [newPost, setNewPost] = useState<IPostFormData>({} as IPostFormData);
 
     const { register, handleSubmit, control, watch, setValue, getValues } =
         useForm<IPostFormData>({
@@ -26,11 +34,6 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
             },
         });
 
-    const navigate = useNavigate();
-    const dispatch = useAppDispatch();
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const user = useAppSelector(getAuthData);
-
     const isAuthor = post && user ? post.author === user._id : false;
 
     useEffect(() => {
@@ -40,48 +43,35 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
     }, [post, isAuthor, navigate]);
 
     const submitPost = async (data: IPostFormData) => {
-        setIsLoading(true);
+        setPostFormStatus("loading");
+        if (post) {
+            const response = await dispatch(
+                updatePost({ oldPost: post, data })
+            );
 
-        try {
-            if (post) {
-                const response = await dispatch(
-                    updatePost({ oldPost: post, data })
-                );
-
-                if (response && response.meta.requestStatus === "fulfilled") {
-                    toast.success("Blog updated successfully.", {
-                        duration: 5000,
-                    });
-                    navigate(`/posts/${data.slug}`);
-                } else if (
-                    response &&
-                    response.meta.requestStatus === "rejected"
-                ) {
-                    toast.error(response.payload as string, { duration: 5000 });
-                }
+            if (response && response.meta.requestStatus === "fulfilled") {
+                setNewPost(data);
+                setPostFormStatus("succeeded");
+            } else if (response && response.meta.requestStatus === "rejected") {
+                setPostFormStatus("failed");
             } else {
-                const response = await dispatch(createNewPost(data));
-
-                if (response && response.meta.requestStatus === "fulfilled") {
-                    toast.success("Blog created successfully.", {
-                        duration: 5000,
-                    });
-                    navigate(`/posts/${data.slug}`);
-                } else if (
-                    response &&
-                    response.meta.requestStatus === "rejected"
-                ) {
-                    toast.error(response.payload as string, {
-                        duration: 5000,
-                    });
-                }
+                setPostFormStatus("idle");
             }
-        } catch (error) {
-            console.log("\n:: Signup.tsx => Error: ", error);
-        } finally {
-            setIsLoading(false);
+        } else {
+            const response = await dispatch(createNewPost(data));
+
+            if (response && response.meta.requestStatus === "fulfilled") {
+                setNewPost(data);
+                setPostFormStatus("succeeded");
+            } else if (response && response.meta.requestStatus === "rejected") {
+                setPostFormStatus("failed");
+            } else {
+                setPostFormStatus("idle");
+            }
         }
     };
+
+    usePostToast(postFormStatus, `/posts/${newPost.slug}`);
 
     // handle cancel button click
     const handleCancelButtonClick = () => {
@@ -126,12 +116,12 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
     let btnText = "";
     if (post) {
         btnText = "Update";
-        if (isLoading) {
+        if (postFormStatus === "loading") {
             btnText = "Updating...";
         }
     } else {
         btnText = "Publish";
-        if (isLoading) {
+        if (postFormStatus === "loading") {
             btnText += "ing...";
         }
     }
@@ -191,7 +181,7 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
                     {...register("status", { required: true })}
                 />
                 <Button
-                    disabled={isLoading}
+                    disabled={postFormStatus === "loading"}
                     type="submit"
                     bgColor={post ? "bg-green-500" : undefined}
                     className={`w-full ${
@@ -203,7 +193,7 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
                     {btnText}
                 </Button>
                 <Button
-                    disabled={isLoading}
+                    disabled={postFormStatus === "loading"}
                     bgColor="bg-red-600 hover:bg-red-700 disabled:bg-red-400 "
                     className="w-full mt-4"
                     onClick={handleCancelButtonClick}

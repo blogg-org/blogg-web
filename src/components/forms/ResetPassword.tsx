@@ -1,22 +1,32 @@
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
-import { useAppDispatch } from "@store/store";
-import { signin } from "@store/slice/authSlice";
+import {
+    Logo,
+    Input,
+    Button,
+    GoBackButton,
+    ErrorInputMessage,
+} from "@components/index";
+import React, { useState } from "react";
+import { useAppDispatch, useAppSelector } from "@store/store";
 import { LuEye, LuEyeOff } from "react-icons/lu";
+import { useAuthToast } from "@hooks/useAuthToast";
 import { Controller, useForm } from "react-hook-form";
-import { ISigninPayload } from "src/types/auth.types";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { signinSchema } from "@form-validations/signin.schema";
-import { Button, ErrorInputMessage, Input, Logo } from "@components/index";
+import { getVerifiedEmail, resetPassword } from "@store/slice/authSlice";
+import { resetPasswordSchema } from "@form-validations/resetPassword.schema";
+import { AuthStateStatus, IResetPasswordPayload } from "src/types/auth.types";
 
-const Login: React.FC = () => {
+const ResetPassword: React.FC = () => {
     const dispatch = useAppDispatch();
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const { control, handleSubmit } = useForm<ISigninPayload>({
-        resolver: yupResolver(signinSchema),
-    });
+    const verifiedEmail = useAppSelector(getVerifiedEmail);
     const [passwordType, setPasswordType] = useState<string>("password");
+    const [resetPasswordStatus, setResetPasswordStatus] =
+        useState<AuthStateStatus>("idle");
+    const { control, handleSubmit } = useForm({
+        defaultValues: {
+            newPassword: "",
+        },
+        resolver: yupResolver(resetPasswordSchema),
+    });
 
     const showHidePassword = () => {
         if (passwordType === "password") {
@@ -26,21 +36,22 @@ const Login: React.FC = () => {
         }
     };
 
-    const handleLogin = async (data: ISigninPayload) => {
-        try {
-            setIsLoading(true);
-            const response = await dispatch(signin(data));
-            if (response && response.meta.requestStatus === "fulfilled") {
-                toast.success(response.payload as string, { duration: 5000 });
-            } else if (response && response.meta.requestStatus === "rejected") {
-                toast.error(response.payload as string, { duration: 5000 });
-            }
-        } catch (error) {
-            console.log("\n:: Signup.tsx => Error: ", error);
-        } finally {
-            setIsLoading(false);
+    const handleResetPassword = async (data: IResetPasswordPayload) => {
+        console.log(data);
+        setResetPasswordStatus("loading");
+        const response = await dispatch(
+            resetPassword({ ...data, email: verifiedEmail })
+        );
+        if (response && response.meta.requestStatus === "fulfilled") {
+            setResetPasswordStatus("succeeded");
+        } else if (response && response.meta.requestStatus === "rejected") {
+            setResetPasswordStatus("failed");
+        } else {
+            setResetPasswordStatus("idle");
         }
     };
+
+    useAuthToast(resetPasswordStatus, "/auth/signin");
 
     return (
         <div className="flex items-center justify-center w-full">
@@ -53,54 +64,24 @@ const Login: React.FC = () => {
                     </span>
                 </div>
                 <h2 className="text-center text-2xl font-bold leading-tight">
-                    Sign in to your account
+                    Reset password
                 </h2>
-                <p className="mt-2 text-center text-base text-black/60">
-                    Don&apos;t have any account?&nbsp;
-                    <Link
-                        to="/signup"
-                        className="font-medium text-primary text-blue-800 transition-all duration-200 hover:underline"
-                    >
-                        Sign Up
-                    </Link>
-                </p>
-                <form onSubmit={handleSubmit(handleLogin)} className="mt-8">
+
+                <form
+                    onSubmit={handleSubmit(handleResetPassword)}
+                    className="mt-8"
+                >
                     <div className="space-y-5">
                         <Controller
-                            name="email"
+                            name="newPassword"
                             control={control}
                             defaultValue=""
                             render={({ field, fieldState }) => (
                                 <div className="relative">
                                     <Input
-                                        label="Email"
-                                        type="email"
-                                        placeholder="Enter your email"
-                                        className={`${
-                                            fieldState.error?.message
-                                                ? "border-red-800"
-                                                : ""
-                                        }`}
-                                        {...field}
-                                    />
-                                    {fieldState.error?.message && (
-                                        <ErrorInputMessage
-                                            message={fieldState.error.message}
-                                        />
-                                    )}
-                                </div>
-                            )}
-                        />
-                        <Controller
-                            name="password"
-                            control={control}
-                            defaultValue=""
-                            render={({ field, fieldState }) => (
-                                <div className="relative">
-                                    <Input
-                                        label="Password"
+                                        label="New Password"
                                         type={passwordType}
-                                        placeholder="Enter your password"
+                                        placeholder="Enter new password"
                                         className={`${
                                             fieldState.error?.message
                                                 ? "border-red-800"
@@ -134,17 +115,22 @@ const Login: React.FC = () => {
                             )}
                         />
                         <Button
-                            disabled={isLoading}
+                            disabled={resetPasswordStatus === "loading"}
                             type="submit"
                             className="w-full hover:bg-blue-700 disabled:bg-blue-400"
                         >
-                            {isLoading ? "Signing in..." : "Sign in"}
+                            {resetPasswordStatus === "loading"
+                                ? "Submitting..."
+                                : "Submit"}
                         </Button>
                     </div>
                 </form>
+                <div className="w-full mt-4 text-center">
+                    <GoBackButton />
+                </div>
             </div>
         </div>
     );
 };
 
-export default Login;
+export default ResetPassword;

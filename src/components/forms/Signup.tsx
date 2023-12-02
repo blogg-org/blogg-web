@@ -1,19 +1,23 @@
+import {
+    Logo,
+    Input,
+    Button,
+    CustomLink,
+    ErrorInputMessage,
+} from "@components/index";
 import { useState } from "react";
-import toast from "react-hot-toast";
 import { useAppDispatch } from "@store/store";
 import { signup } from "@store/slice/authSlice";
 import { LuEye, LuEyeOff } from "react-icons/lu";
-import { Link, useNavigate } from "react-router-dom";
+import { useAuthToast } from "@hooks/useAuthToast";
 import { Controller, useForm } from "react-hook-form";
-import { ISignupPayload } from "src/types/auth.types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupSchema } from "@form-validations/signup.schema";
-import { Button, ErrorInputMessage, Input, Logo } from "@components/index";
+import { AuthStateStatus, ISignupPayload } from "src/types/auth.types";
 
 const Signup: React.FC = () => {
-    const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [signupStatus, setSignupStatus] = useState<AuthStateStatus>("idle");
     const { control, handleSubmit } = useForm<ISignupPayload>({
         defaultValues: {
             fullname: "",
@@ -33,21 +37,18 @@ const Signup: React.FC = () => {
     };
 
     const handleSignup = async (data: ISignupPayload) => {
-        try {
-            setIsLoading(true);
-            const response = await dispatch(signup(data));
-            if (response && response.meta.requestStatus === "fulfilled") {
-                toast.success(response.payload as string, { duration: 5000 });
-                navigate("/signin");
-            } else if (response && response.meta.requestStatus === "rejected") {
-                toast.error(response.payload as string, { duration: 5000 });
-            }
-        } catch (error) {
-            console.log("\n:: Signup.tsx => Error: ", error);
-        } finally {
-            setIsLoading(false);
+        setSignupStatus("loading");
+        const response = await dispatch(signup(data));
+        if (response && response.meta.requestStatus === "fulfilled") {
+            setSignupStatus("succeeded");
+        } else if (response && response.meta.requestStatus === "rejected") {
+            setSignupStatus("failed");
+        } else {
+            setSignupStatus("idle");
         }
     };
+
+    useAuthToast(signupStatus, "/auth/signin");
 
     return (
         <div className="flex items-center justify-center">
@@ -64,15 +65,11 @@ const Signup: React.FC = () => {
                 </h2>
                 <p className="mt-2 text-center text-base text-black/60">
                     Already have an account?&nbsp;
-                    <Link
-                        to="/signin"
-                        className="font-medium text-primary text-blue-800 transition-all duration-200 hover:underline"
-                    >
-                        Sign In
-                    </Link>
+                    <CustomLink to="/auth/signin">Sign in</CustomLink>
                 </p>
                 <form onSubmit={handleSubmit(handleSignup)} className="mt-2">
                     <div className="space-y-5">
+                        {/* fullname */}
                         <Controller
                             name="fullname"
                             control={control}
@@ -99,6 +96,7 @@ const Signup: React.FC = () => {
                             )}
                         />
 
+                        {/* email */}
                         <Controller
                             name="email"
                             control={control}
@@ -124,6 +122,8 @@ const Signup: React.FC = () => {
                                 </div>
                             )}
                         />
+
+                        {/* password */}
                         <Controller
                             name="password"
                             control={control}
@@ -131,7 +131,7 @@ const Signup: React.FC = () => {
                             render={({ field, fieldState }) => (
                                 <div className="relative">
                                     <Input
-                                        label="Confirm Password"
+                                        label="Password"
                                         type={passwordType}
                                         placeholder="Enter your password"
                                         className={`${
@@ -167,11 +167,13 @@ const Signup: React.FC = () => {
                             )}
                         />
                         <Button
-                            disabled={isLoading}
+                            disabled={signupStatus === "loading"}
                             type="submit"
                             className="w-full hover:bg-blue-700 disabled:bg-blue-400"
                         >
-                            {isLoading ? "Signing up..." : "Sign up"}
+                            {signupStatus === "loading"
+                                ? "Signing up..."
+                                : "Sign up"}
                         </Button>
                     </div>
                 </form>

@@ -1,7 +1,7 @@
 import React, {
-    HTMLInputTypeAttribute,
-    InputHTMLAttributes,
     useId,
+    InputHTMLAttributes,
+    HTMLInputTypeAttribute,
 } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {

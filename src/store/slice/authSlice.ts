@@ -1,10 +1,10 @@
-import { rootState } from "@store/store";
-import { IAccessToken } from "src/types/axios.types";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
     handleSigninApi,
     handleSignupApi,
     handleSignoutApi,
+    handleVerifyOTPApi,
+    handleVerifyEmailApi,
+    handleResetPasswordApi,
     handleGetCurrentUserApi,
     handleChangePasswordApi,
 } from "@api/users.api";
@@ -12,17 +12,18 @@ import {
     IUserData,
     ISigninPayload,
     ISignupPayload,
+    IVerifyEmailPayload,
     IChangePasswordPayload,
+    IResetPasswordApiPayload,
 } from "src/types/auth.types";
-
-export interface ISignupResponse {
-    message: string;
-}
+import { rootState } from "@store/store";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 interface IInitialState {
     status: "idle" | "loading" | "succeeded" | "failed";
     data: IUserData;
     isLoggedIn: string;
+    verifiedEmail: string;
     message: string;
     error: string;
 }
@@ -30,7 +31,8 @@ interface IInitialState {
 const initialState: IInitialState = {
     status: "idle",
     data: {} as IUserData,
-    isLoggedIn: localStorage.getItem("isLoggedIn") ?? "false",
+    isLoggedIn: localStorage.getItem("isSignedIn") ?? "false",
+    verifiedEmail: "",
     message: "",
     error: "",
 };
@@ -38,31 +40,21 @@ const initialState: IInitialState = {
 // signup user
 export const signup = createAsyncThunk(
     "auth/signup",
-    async (data: ISignupPayload, { rejectWithValue }) => {
-        try {
-            const response = await handleSignupApi(data);
-
-            return response.message;
-        } catch (error) {
-            return rejectWithValue(error);
-        }
+    async (data: ISignupPayload) => {
+        const response = await handleSignupApi(data);
+        return response;
     }
 );
 
 // signin user
 export const signin = createAsyncThunk(
     "auth/signin",
-    async (data: ISigninPayload, { rejectWithValue }) => {
-        try {
-            const response = await handleSigninApi(data);
-
-            const resData = response.data as IAccessToken;
-            localStorage.setItem("access_token", resData.accessToken);
-            localStorage.setItem("isLoggedIn", "true");
-            return response.message;
-        } catch (error) {
-            return rejectWithValue(error);
-        }
+    async (data: ISigninPayload) => {
+        const response = await handleSigninApi(data);
+        console.log("response authslice signin: ", response.accessToken);
+        localStorage.setItem("access_token", response.accessToken);
+        localStorage.setItem("isSignedIn", "true");
+        return response.message;
     }
 );
 
@@ -74,35 +66,57 @@ export const currentUser = createAsyncThunk("auth/currentUser", async () => {
 
 // signout user
 export const signout = createAsyncThunk("auth/signout", async () => {
-    try {
-        const response = await handleSignoutApi();
-        if (response) {
-            localStorage.setItem("isLoggedIn", "false");
-            return response.message;
-        }
-    } catch (error) {
-        console.log("\n:: Error => authSlice => signout: ", error);
-        throw error;
-    }
+    const response = await handleSignoutApi();
+    localStorage.setItem("isSignedIn", "false");
+    return response;
 });
 
 // change password
 export const changePassword = createAsyncThunk(
     "auth/change-password",
-    async (data: IChangePasswordPayload, { rejectWithValue }) => {
-        try {
-            const response = await handleChangePasswordApi(data);
-            return response.message;
-        } catch (error) {
-            return rejectWithValue(error);
-        }
+    async (data: IChangePasswordPayload) => {
+        const response = await handleChangePasswordApi(data);
+        return response;
+    }
+);
+
+// verify email
+export const verifyEmail = createAsyncThunk(
+    "auth/verify-email",
+    async (data: IVerifyEmailPayload) => {
+        const response = await handleVerifyEmailApi(data);
+        return response;
+    }
+);
+
+// verify OTP
+export const verifyOTP = createAsyncThunk(
+    "auth/verify-otp",
+    async (otp: string) => {
+        const response = await handleVerifyOTPApi(otp);
+        return response;
+    }
+);
+
+// reset Password
+export const resetPassword = createAsyncThunk(
+    "auth/reset-password",
+    async (data: IResetPasswordApiPayload) => {
+        const response = await handleResetPasswordApi(data);
+        return response;
     }
 );
 
 const authSlice = createSlice({
     name: "auth",
     initialState,
-    reducers: {},
+    reducers: {
+        resetVerifiedEmail: (state) => {
+            state.status = "idle";
+            state.message = "";
+            state.verifiedEmail = "";
+        },
+    },
     extraReducers: (builder) => {
         builder
             // signup
@@ -112,14 +126,14 @@ const authSlice = createSlice({
             .addCase(signup.fulfilled, (state, action) => {
                 state.status = "succeeded";
                 state.data = {} as IUserData;
-                state.message = action.payload;
+                state.message = action.payload.message;
                 state.error = "";
             })
             .addCase(signup.rejected, (state, action) => {
                 state.status = "failed";
                 state.data = {} as IUserData;
                 state.message = "";
-                state.error = action.payload as string;
+                state.error = action.error.message!;
             })
 
             // signin
@@ -137,7 +151,7 @@ const authSlice = createSlice({
                 state.status = "failed";
                 state.data = {} as IUserData;
                 state.message = "";
-                state.error = action.payload as string;
+                state.error = action.error.message!;
             })
 
             // current user
@@ -146,14 +160,15 @@ const authSlice = createSlice({
             })
             .addCase(currentUser.fulfilled, (state, action) => {
                 state.status = "succeeded";
-                state.data = action.payload!;
+                state.data = action.payload.currentUser;
+                state.message = action.payload.message;
                 state.error = "";
             })
             .addCase(currentUser.rejected, (state, action) => {
                 state.status = "failed";
                 state.data = {} as IUserData;
                 state.message = "";
-                state.error = action.payload as string;
+                state.error = action.error.message!;
             })
 
             // signout
@@ -163,15 +178,15 @@ const authSlice = createSlice({
             .addCase(signout.fulfilled, (state, action) => {
                 state.status = "succeeded";
                 state.data = {} as IUserData;
-                state.message = action.payload!;
                 state.isLoggedIn = "false";
+                state.message = action.payload.message;
                 state.error = "";
             })
             .addCase(signout.rejected, (state, action) => {
                 state.status = "failed";
                 state.data = {} as IUserData;
                 state.message = "";
-                state.error = action.payload as string;
+                state.error = action.error.message!;
             })
 
             // change password
@@ -180,22 +195,73 @@ const authSlice = createSlice({
             })
             .addCase(changePassword.fulfilled, (state, action) => {
                 state.status = "succeeded";
-                state.data = {} as IUserData;
-                state.message = action.payload;
+                state.message = action.payload.message;
                 state.error = "";
             })
             .addCase(changePassword.rejected, (state, action) => {
                 state.status = "failed";
                 state.message = "";
-                state.error = action.payload as string;
+                state.error = action.error.message!;
+            })
+
+            // verify email
+            .addCase(verifyEmail.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(verifyEmail.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                state.verifiedEmail = action.payload.email;
+                state.message = action.payload.message;
+                state.error = "";
+            })
+            .addCase(verifyEmail.rejected, (state, action) => {
+                state.status = "failed";
+                state.message = "";
+                state.verifiedEmail = "";
+                state.error = action.error.message!;
+            })
+
+            // verify OTP
+            .addCase(verifyOTP.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(verifyOTP.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                state.message = action.payload.message;
+                state.error = "";
+            })
+            .addCase(verifyOTP.rejected, (state, action) => {
+                state.status = "failed";
+                state.message = "";
+                state.error = action.error.message!;
+            })
+
+            // reset password
+            .addCase(resetPassword.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(resetPassword.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                state.verifiedEmail = "";
+                state.message = action.payload.message;
+                state.error = "";
+            })
+            .addCase(resetPassword.rejected, (state, action) => {
+                state.status = "failed";
+                state.message = "";
+                state.error = action.error.message!;
             });
     },
 });
 
 export const getAuthStatus = (state: typeof rootState) => state.auth.status;
+export const getAuthMessage = (state: typeof rootState) => state.auth.message;
 export const getAuthData = (state: typeof rootState) => state.auth.data;
 export const getAuthError = (state: typeof rootState) => state.auth.error;
 export const getLoginStatus = (state: typeof rootState) =>
     state.auth.isLoggedIn;
+export const getVerifiedEmail = (state: typeof rootState) =>
+    state.auth.verifiedEmail;
 
+export const { resetVerifiedEmail } = authSlice.actions;
 export default authSlice.reducer;

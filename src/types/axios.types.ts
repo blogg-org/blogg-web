@@ -1,13 +1,18 @@
-import { IUserData } from "./auth.types";
+// import { IUserData } from "./auth.types";
+// import { IPostFromDB } from "./blogs.types";
 
 export interface IAccessToken {
     accessToken: string;
 }
 
-export interface IAxiosResponseData {
+export interface IEmail {
+    email: string;
+}
+
+export interface IAxiosResponseData<T> {
     statusCode: number;
     message: string;
-    data: IUserData | IAccessToken;
+    data: T;
     success: boolean;
 }
 
@@ -19,6 +24,8 @@ export interface IAxiosError {
             message: string;
             data?: null;
             success: boolean;
+            errors?: string[] | [];
+            stack?: string;
         };
     };
     request?: XMLHttpRequest;

@@ -12,12 +12,6 @@ export interface IPostFromDB {
     author: string;
 }
 
-export interface IInitialStatePostsSlice {
-    status: "idle" | "loading" | "succeeded" | "failed";
-    data: IPostFromDB[];
-    error: string;
-}
-
 export interface IPostFormData {
     title: string;
     slug: string;

@@ -2,16 +2,9 @@ import React, { useEffect } from "react";
 import { useAppSelector } from "@store/store";
 import { getLoginStatus } from "@store/slice/authSlice";
 import { useDocumentTitle } from "@hooks/useDocumentTitle";
-import { Login as LoginComponent } from "@components/index";
-import { Location, useLocation, useNavigate } from "react-router-dom";
-
-interface ILocation extends Location {
-    hash: string;
-    key: string;
-    pathname: string;
-    search: string;
-    state: null | { from: string };
-}
+import { Signin as SigninForm } from "@components/index";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ILocation } from "src/types/auth.types";
 
 const Login: React.FC = () => {
     useDocumentTitle("blogg - Sign in");
@@ -26,7 +19,7 @@ const Login: React.FC = () => {
         }
     }, [navigate, isSignedIn, location.state?.from]);
 
-    return <LoginComponent />;
+    return <SigninForm />;
 };
 
 export default Login;

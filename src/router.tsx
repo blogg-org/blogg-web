@@ -1,12 +1,15 @@
 import {
     Home,
     Post,
-    Login,
+    Signin,
     Signup,
     AddPost,
     AllPosts,
     EditPost,
     ChangePassword,
+    VerifyEmail,
+    VerifyOTP,
+    ResetPassword,
 } from "@pages/index";
 import {
     Route,
@@ -20,8 +23,11 @@ const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<App />}>
             <Route path="" element={<Home />} />
-            <Route path="signin" element={<Login />} />
-            <Route path="signup" element={<Signup />} />
+            <Route path="auth/signin" element={<Signin />} />
+            <Route path="auth/signup" element={<Signup />} />
+            <Route path="auth/verify-email" element={<VerifyEmail />} />
+            <Route path="auth/verify-otp" element={<VerifyOTP />} />
+            <Route path="auth/reset-password" element={<ResetPassword />} />
             <Route
                 path="auth/change-password"
                 element={
