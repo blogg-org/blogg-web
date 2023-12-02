@@ -1,20 +1,30 @@
+import {
+    Logo,
+    Input,
+    Button,
+    CustomLink,
+    ErrorInputMessage,
+} from "@components/index";
 import { useState } from "react";
-import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
 import { useAppDispatch } from "@store/store";
-import { signin } from "@store/slice/authSlice";
+import { signup } from "@store/slice/authSlice";
 import { LuEye, LuEyeOff } from "react-icons/lu";
+import { useAuthToast } from "@hooks/useAuthToast";
 import { Controller, useForm } from "react-hook-form";
-import { ISigninPayload } from "src/types/auth.types";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { signinSchema } from "@form-validations/signin.schema";
-import { Button, ErrorInputMessage, Input, Logo } from "@components/index";
+import { signupSchema } from "@form-validations/signup.schema";
+import { AuthStateStatus, ISignupPayload } from "src/types/auth.types";
 
-const Login: React.FC = () => {
+const Signup: React.FC = () => {
     const dispatch = useAppDispatch();
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const { control, handleSubmit } = useForm<ISigninPayload>({
-        resolver: yupResolver(signinSchema),
+    const [signupStatus, setSignupStatus] = useState<AuthStateStatus>("idle");
+    const { control, handleSubmit } = useForm<ISignupPayload>({
+        defaultValues: {
+            fullname: "",
+            email: "",
+            password: "",
+        },
+        resolver: yupResolver(signupSchema),
     });
     const [passwordType, setPasswordType] = useState<string>("password");
 
@@ -26,24 +36,22 @@ const Login: React.FC = () => {
         }
     };
 
-    const handleLogin = async (data: ISigninPayload) => {
-        try {
-            setIsLoading(true);
-            const response = await dispatch(signin(data));
-            if (response && response.meta.requestStatus === "fulfilled") {
-                toast.success(response.payload as string, { duration: 5000 });
-            } else if (response && response.meta.requestStatus === "rejected") {
-                toast.error(response.payload as string, { duration: 5000 });
-            }
-        } catch (error) {
-            console.log("\n:: Signup.tsx => Error: ", error);
-        } finally {
-            setIsLoading(false);
+    const handleSignup = async (data: ISignupPayload) => {
+        setSignupStatus("loading");
+        const response = await dispatch(signup(data));
+        if (response && response.meta.requestStatus === "fulfilled") {
+            setSignupStatus("succeeded");
+        } else if (response && response.meta.requestStatus === "rejected") {
+            setSignupStatus("failed");
+        } else {
+            setSignupStatus("idle");
         }
     };
 
+    useAuthToast(signupStatus, "/auth/signin");
+
     return (
-        <div className="flex items-center justify-center w-full">
+        <div className="flex items-center justify-center">
             <div
                 className={`mx-auto w-full max-w-lg bg-blue-100 rounded-xl p-10 border border-black/10`}
             >
@@ -53,19 +61,42 @@ const Login: React.FC = () => {
                     </span>
                 </div>
                 <h2 className="text-center text-2xl font-bold leading-tight">
-                    Sign in to your account
+                    Sign up to create account
                 </h2>
                 <p className="mt-2 text-center text-base text-black/60">
-                    Don&apos;t have any account?&nbsp;
-                    <Link
-                        to="/signup"
-                        className="font-medium text-primary text-blue-800 transition-all duration-200 hover:underline"
-                    >
-                        Sign Up
-                    </Link>
+                    Already have an account?&nbsp;
+                    <CustomLink to="/auth/signin">Sign in</CustomLink>
                 </p>
-                <form onSubmit={handleSubmit(handleLogin)} className="mt-8">
+                <form onSubmit={handleSubmit(handleSignup)} className="mt-2">
                     <div className="space-y-5">
+                        {/* fullname */}
+                        <Controller
+                            name="fullname"
+                            control={control}
+                            defaultValue=""
+                            render={({ field, fieldState }) => (
+                                <div className="relative">
+                                    <Input
+                                        label="Fullname"
+                                        type="fullname"
+                                        placeholder="Enter your fullname"
+                                        className={`${
+                                            fieldState.error?.message
+                                                ? "border-red-800"
+                                                : ""
+                                        }`}
+                                        {...field}
+                                    />
+                                    {fieldState.error?.message && (
+                                        <ErrorInputMessage
+                                            message={fieldState.error.message}
+                                        />
+                                    )}
+                                </div>
+                            )}
+                        />
+
+                        {/* email */}
                         <Controller
                             name="email"
                             control={control}
@@ -91,6 +122,8 @@ const Login: React.FC = () => {
                                 </div>
                             )}
                         />
+
+                        {/* password */}
                         <Controller
                             name="password"
                             control={control}
@@ -134,11 +167,13 @@ const Login: React.FC = () => {
                             )}
                         />
                         <Button
-                            disabled={isLoading}
+                            disabled={signupStatus === "loading"}
                             type="submit"
                             className="w-full hover:bg-blue-700 disabled:bg-blue-400"
                         >
-                            {isLoading ? "Signing in..." : "Sign in"}
+                            {signupStatus === "loading"
+                                ? "Signing up..."
+                                : "Sign up"}
                         </Button>
                     </div>
                 </form>
@@ -147,4 +182,4 @@ const Login: React.FC = () => {
     );
 };
 
-export default Login;
+export default Signup;

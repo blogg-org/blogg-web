@@ -1,25 +1,22 @@
-import {
-    deletePost,
-    getPostsStatus,
-    getPostFromSlug,
-} from "@store/slice/blogsSlice";
-import toast from "react-hot-toast";
+import { useState } from "react";
 import parse from "html-react-parser";
 import { Button } from "@components/index";
+import { Link, useParams } from "react-router-dom";
+import { usePostToast } from "@hooks/usePostToast";
 import { getAuthData } from "@store/slice/authSlice";
+import { AuthStateStatus } from "src/types/auth.types";
 import { useDocumentTitle } from "@hooks/useDocumentTitle";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { deletePost, getPostFromSlug } from "@store/slice/blogsSlice";
 import { rootState, useAppDispatch, useAppSelector } from "@store/store";
 
 const Post: React.FC = () => {
     const { slug } = useParams();
-    const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const post = useAppSelector((state: typeof rootState) =>
         getPostFromSlug(state, slug!)
     );
-    const postsStatus = useAppSelector(getPostsStatus);
     const user = useAppSelector(getAuthData);
+    const [postStatus, setPostStatus] = useState<AuthStateStatus>("idle");
 
     useDocumentTitle(post?.title ?? "blogg - Not found");
 
@@ -27,21 +24,19 @@ const Post: React.FC = () => {
     const isAuthor = post && user ? post.author === user._id : false;
 
     const handleDelete = async () => {
-        try {
-            const response = await dispatch(deletePost(post?._id ?? ""));
+        setPostStatus("loading");
+        const response = await dispatch(deletePost(post?._id ?? ""));
 
-            if (response && response.meta.requestStatus === "fulfilled") {
-                toast.success("Blog deleted successfully.", {
-                    duration: 5000,
-                });
-                navigate("/");
-            } else if (response && response.meta.requestStatus === "rejected") {
-                toast.error(response.payload as string, { duration: 5000 });
-            }
-        } catch (error) {
-            console.log("\n:: Post.tsx => Error: ", error);
+        if (response && response.meta.requestStatus === "fulfilled") {
+            setPostStatus("succeeded");
+        } else if (response && response.meta.requestStatus === "rejected") {
+            setPostStatus("failed");
+        } else {
+            setPostStatus("idle");
         }
     };
+
+    usePostToast(postStatus, "/");
 
     if (post && Object.keys(post).length > 0) {
         return (
@@ -64,11 +59,11 @@ const Post: React.FC = () => {
                                 </Button>
                             </Link>
                             <Button
-                                disabled={postsStatus === "loading"}
+                                disabled={postStatus === "loading"}
                                 bgColor="bg-red-600 hover:bg-red-700 disabled:bg-red-400 "
                                 onClick={handleDelete}
                             >
-                                {postsStatus === "loading"
+                                {postStatus === "loading"
                                     ? "Deleting..."
                                     : "Delete"}
                             </Button>

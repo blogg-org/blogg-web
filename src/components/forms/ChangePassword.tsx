@@ -1,26 +1,30 @@
-import { useState } from "react";
-import toast from "react-hot-toast";
+import {
+    Logo,
+    Input,
+    Button,
+    CustomLink,
+    ErrorInputMessage,
+} from "@components/index";
+import React, { useState } from "react";
 import { useAppDispatch } from "@store/store";
-import { signup } from "@store/slice/authSlice";
 import { LuEye, LuEyeOff } from "react-icons/lu";
-import { Link, useNavigate } from "react-router-dom";
+import { useAuthToast } from "@hooks/useAuthToast";
 import { Controller, useForm } from "react-hook-form";
-import { ISignupPayload } from "src/types/auth.types";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { signupSchema } from "@form-validations/signup.schema";
-import { Button, ErrorInputMessage, Input, Logo } from "@components/index";
+import { changePassword } from "@store/slice/authSlice";
+import { AuthStateStatus, IChangePasswordPayload } from "src/types/auth.types";
+import { changePasswordSchema } from "@form-validations/changePassword.schema";
 
-const Signup: React.FC = () => {
-    const navigate = useNavigate();
+const ChangePassword: React.FC = () => {
     const dispatch = useAppDispatch();
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const { control, handleSubmit } = useForm<ISignupPayload>({
+    const [changePasswordStatus, setChangePasswordStatus] =
+        useState<AuthStateStatus>("idle");
+    const { control, handleSubmit } = useForm<IChangePasswordPayload>({
         defaultValues: {
-            fullname: "",
-            email: "",
-            password: "",
+            oldPassword: "",
+            newPassword: "",
         },
-        resolver: yupResolver(signupSchema),
+        resolver: yupResolver(changePasswordSchema),
     });
     const [passwordType, setPasswordType] = useState<string>("password");
 
@@ -32,25 +36,20 @@ const Signup: React.FC = () => {
         }
     };
 
-    const handleSignup = async (data: ISignupPayload) => {
-        try {
-            setIsLoading(true);
-            const response = await dispatch(signup(data));
-            if (response && response.meta.requestStatus === "fulfilled") {
-                toast.success(response.payload as string, { duration: 5000 });
-                navigate("/signin");
-            } else if (response && response.meta.requestStatus === "rejected") {
-                toast.error(response.payload as string, { duration: 5000 });
-            }
-        } catch (error) {
-            console.log("\n:: Signup.tsx => Error: ", error);
-        } finally {
-            setIsLoading(false);
+    const handleChangePassword = async (data: IChangePasswordPayload) => {
+        setChangePasswordStatus("loading");
+        const response = await dispatch(changePassword(data));
+        if (response && response.meta.requestStatus === "fulfilled") {
+            setChangePasswordStatus("succeeded");
+        } else if (response && response.meta.requestStatus === "rejected") {
+            setChangePasswordStatus("failed");
         }
     };
 
+    useAuthToast(changePasswordStatus, "/");
+
     return (
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center w-full">
             <div
                 className={`mx-auto w-full max-w-lg bg-blue-100 rounded-xl p-10 border border-black/10`}
             >
@@ -60,78 +59,23 @@ const Signup: React.FC = () => {
                     </span>
                 </div>
                 <h2 className="text-center text-2xl font-bold leading-tight">
-                    Sign up to create account
+                    Change Password
                 </h2>
-                <p className="mt-2 text-center text-base text-black/60">
-                    Already have an account?&nbsp;
-                    <Link
-                        to="/signin"
-                        className="font-medium text-primary text-blue-800 transition-all duration-200 hover:underline"
-                    >
-                        Sign In
-                    </Link>
-                </p>
-                <form onSubmit={handleSubmit(handleSignup)} className="mt-2">
-                    <div className="space-y-5">
-                        <Controller
-                            name="fullname"
-                            control={control}
-                            defaultValue=""
-                            render={({ field, fieldState }) => (
-                                <div className="relative">
-                                    <Input
-                                        label="Fullname"
-                                        type="fullname"
-                                        placeholder="Enter your fullname"
-                                        className={`${
-                                            fieldState.error?.message
-                                                ? "border-red-800"
-                                                : ""
-                                        }`}
-                                        {...field}
-                                    />
-                                    {fieldState.error?.message && (
-                                        <ErrorInputMessage
-                                            message={fieldState.error.message}
-                                        />
-                                    )}
-                                </div>
-                            )}
-                        />
 
+                <form
+                    onSubmit={handleSubmit(handleChangePassword)}
+                    className="mt-8"
+                >
+                    <div className="space-y-5">
+                        {/* recent password */}
                         <Controller
-                            name="email"
+                            name="oldPassword"
                             control={control}
                             defaultValue=""
                             render={({ field, fieldState }) => (
                                 <div className="relative">
                                     <Input
-                                        label="Email"
-                                        type="email"
-                                        placeholder="Enter your email"
-                                        className={`${
-                                            fieldState.error?.message
-                                                ? "border-red-800"
-                                                : ""
-                                        }`}
-                                        {...field}
-                                    />
-                                    {fieldState.error?.message && (
-                                        <ErrorInputMessage
-                                            message={fieldState.error.message}
-                                        />
-                                    )}
-                                </div>
-                            )}
-                        />
-                        <Controller
-                            name="password"
-                            control={control}
-                            defaultValue=""
-                            render={({ field, fieldState }) => (
-                                <div className="relative">
-                                    <Input
-                                        label="Confirm Password"
+                                        label="Recent Password"
                                         type={passwordType}
                                         placeholder="Enter your password"
                                         className={`${
@@ -166,18 +110,69 @@ const Signup: React.FC = () => {
                                 </div>
                             )}
                         />
+                        {/* new password */}
+                        <Controller
+                            name="newPassword"
+                            control={control}
+                            defaultValue=""
+                            render={({ field, fieldState }) => (
+                                <div className="relative">
+                                    <Input
+                                        label="New Password"
+                                        type={passwordType}
+                                        placeholder="Enter new password"
+                                        className={`${
+                                            fieldState.error?.message
+                                                ? "border-red-800"
+                                                : ""
+                                        }`}
+                                        {...field}
+                                    />
+                                    {field.value && (
+                                        <div
+                                            className="absolute top-12 -translate-y-1/2 right-3 hover:cursor-pointer scale-125"
+                                            onClick={showHidePassword}
+                                            title={`${
+                                                passwordType === "password"
+                                                    ? "show"
+                                                    : "hide"
+                                            } password`}
+                                        >
+                                            {passwordType === "password" ? (
+                                                <LuEyeOff />
+                                            ) : (
+                                                <LuEye />
+                                            )}
+                                        </div>
+                                    )}
+                                    {fieldState.error?.message && (
+                                        <ErrorInputMessage
+                                            message={fieldState.error.message}
+                                        />
+                                    )}
+                                </div>
+                            )}
+                        />
                         <Button
-                            disabled={isLoading}
+                            disabled={changePasswordStatus === "loading"}
                             type="submit"
-                            className="w-full hover:bg-blue-700 disabled:bg-blue-400"
+                            bgColor="bg-green-500"
+                            className="w-full hover:bg-green-600 disabled:bg-green-400"
                         >
-                            {isLoading ? "Signing up..." : "Sign up"}
+                            {changePasswordStatus === "loading"
+                                ? "Updating..."
+                                : "Update"}
                         </Button>
                     </div>
                 </form>
+                <div className="w-full text-center mt-4">
+                    <CustomLink to="/auth/verify-email">
+                        Forgot Password?
+                    </CustomLink>
+                </div>
             </div>
         </div>
     );
 };
 
-export default Signup;
+export default ChangePassword;

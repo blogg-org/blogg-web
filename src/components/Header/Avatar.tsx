@@ -1,15 +1,12 @@
-import toast from "react-hot-toast";
-import { NavLink } from "react-router-dom";
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment, useState } from "react";
+import { useAuthToast } from "@hooks/useAuthToast";
 import { Menu, Transition } from "@headlessui/react";
 import defaultUserIcon from "@assets/user-alien.svg";
+import { resetPosts } from "@store/slice/blogsSlice";
+import { AuthStateStatus } from "src/types/auth.types";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@store/store";
-import {
-    currentUser,
-    getAuthData,
-    getLoginStatus,
-    signout,
-} from "@store/slice/authSlice";
+import { signout, getAuthData, getLoginStatus } from "@store/slice/authSlice";
 
 interface AvatarProps {
     showLink: boolean;
@@ -17,26 +14,29 @@ interface AvatarProps {
 
 const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const isSignedIn = useAppSelector(getLoginStatus) === "true";
     const authData = useAppSelector(getAuthData);
+    const [logoutStatus, setLogoutStatus] = useState<AuthStateStatus>("idle");
+
+    const handleChangePasswordButtonClick = () => {
+        navigate("/auth/change-password");
+    };
 
     const handleLogout = async () => {
+        setLogoutStatus("loading");
         const response = await dispatch(signout());
         if (response && response.meta.requestStatus === "fulfilled") {
-            toast.success(response.payload as string, { duration: 5000 });
+            setLogoutStatus("succeeded");
+            dispatch(resetPosts());
         } else if (response && response.meta.requestStatus === "rejected") {
-            toast.error(response.payload as string, { duration: 5000 });
+            setLogoutStatus("failed");
+        } else {
+            setLogoutStatus("idle");
         }
     };
 
-    useEffect(() => {
-        // IIFE (immediately invoked function expression)
-        (async () => {
-            if (isSignedIn) {
-                await dispatch(currentUser());
-            }
-        })();
-    }, [isSignedIn, dispatch]);
+    useAuthToast(logoutStatus);
 
     return (
         <Menu as="div" className="group relative z-50">
@@ -114,10 +114,26 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                                     </Menu.Item>
                                 </div>
                             ) : null}
+                            {/* change password button */}
                             <Menu.Item>
                                 {({ active }) => (
                                     <button
-                                        // disabled={userData.authStatus === "loading"}
+                                        onClick={
+                                            handleChangePasswordButtonClick
+                                        }
+                                        className={`w-full p-2 border mb-3 border-blue-500 rounded-md text-base transition-colors duration-200 ease-in disabled:cursor-not-allowed ${
+                                            active && "bg-blue-500"
+                                        }`}
+                                    >
+                                        Change Password
+                                    </button>
+                                )}
+                            </Menu.Item>
+
+                            {/* sign out button */}
+                            <Menu.Item>
+                                {({ active }) => (
+                                    <button
                                         onClick={handleLogout}
                                         className={`w-full p-2 border border-blue-500 rounded-md text-base transition-colors duration-200 ease-in disabled:cursor-not-allowed ${
                                             active && "bg-blue-500"
@@ -133,7 +149,7 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                             <Menu.Item>
                                 {() => (
                                     <div className="inline-block">
-                                        You are not logged in!
+                                        You are not signed in!
                                     </div>
                                 )}
                             </Menu.Item>
@@ -142,7 +158,7 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                                     <Menu.Item>
                                         {() => (
                                             <NavLink
-                                                to="/signin"
+                                                to="/auth/signin"
                                                 className={({ isActive }) =>
                                                     `w-full block p-2 border border-blue-500 hover:bg-blue-500 text-center rounded-md text-base transition-colors duration-200 ease-in disabled:cursor-not-allowed ${
                                                         isActive
@@ -159,7 +175,7 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                                     <Menu.Item>
                                         {() => (
                                             <NavLink
-                                                to="/signup"
+                                                to="/auth/signup"
                                                 className={({ isActive }) =>
                                                     `w-full block p-2 border border-blue-500 hover:bg-blue-500 text-center rounded-md text-base transition-colors duration-200 ease-in disabled:cursor-not-allowed ${
                                                         isActive

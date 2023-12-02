@@ -15,7 +15,7 @@ const Home: React.FC = () => {
                         You are not signed in. Sign in to read posts.
                     </h1>
                     <Link
-                        to="/signin"
+                        to="/auth/signin"
                         className="block mt-6 text-lg bg-blue-400 w-max py-4 px-6 rounded-md hover:bg-blue-500 duration-200 ease-out"
                     >
                         Sign in

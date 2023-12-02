@@ -1,93 +1,156 @@
 import {
+    IEmail,
+    IAccessToken,
+    IAxiosResponseData,
+} from "src/types/axios.types";
+import {
     IUserData,
     ISigninPayload,
     ISignupPayload,
+    IVerifyEmailPayload,
+    IChangePasswordPayload,
+    IResetPasswordApiPayload,
 } from "src/types/auth.types";
 import axiosInstance from "@config/axios.config";
-import { IAccessToken, IAxiosResponseData } from "src/types/axios.types";
+import { AxiosResponse } from "axios";
 
-// handle signup
-export const handleSignupApi = async (
-    data: ISignupPayload
-): Promise<IAxiosResponseData> => {
-    try {
-        const response = await axiosInstance.post<Promise<IAxiosResponseData>>(
-            `/api/v1/auth/signup`,
-            data
-        );
-
-        return await response.data;
-    } catch (error) {
-        throw error as string;
-    }
+/*
+==============================================
+API - SIGNUP
+==============================================
+ */
+export const handleSignupApi = async (data: ISignupPayload) => {
+    const response = await axiosInstance.post<
+        null,
+        AxiosResponse<Promise<IAxiosResponseData<null>>>
+    >(`/api/v1/auth/signup`, data);
+    const message = (await response.data).message;
+    return { message };
 };
 
-// handle signin
-export const handleSigninApi = async (
-    data: ISigninPayload
-): Promise<IAxiosResponseData> => {
-    try {
-        const response = await axiosInstance.post<Promise<IAxiosResponseData>>(
-            `/api/v1/auth/signin`,
-            data
-        );
-
-        //     "\n:: users.api => handleSigninApi => response.data: ",
-        //     response.data
-        // );
-        return await response.data;
-    } catch (error) {
-        throw error as string;
-    }
+/*
+==============================================
+API - SIGNIN
+==============================================
+ */
+export const handleSigninApi = async (data: ISigninPayload) => {
+    const response = await axiosInstance.post<
+        null,
+        AxiosResponse<Promise<IAxiosResponseData<IAccessToken>>>
+    >(`/api/v1/auth/signin`, data);
+    const { accessToken } = (await response.data).data;
+    const message = (await response.data).message;
+    return {
+        accessToken,
+        message,
+    };
 };
 
-// handle current user
-export const handleGetCurrentUserApi = async (): Promise<IUserData> => {
-    try {
-        const refreshResponse = await axiosInstance.get<
-            Promise<IAxiosResponseData>
-        >("/api/v1/auth/refresh");
-        const refreshResponseData = (await refreshResponse.data)
-            .data as IAccessToken;
+/*
+==============================================
+API - GET CURRENT USER
+==============================================
+ */
+export const handleGetCurrentUserApi = async () => {
+    const refreshResponse = await axiosInstance.get<
+        null,
+        AxiosResponse<Promise<IAxiosResponseData<IAccessToken>>>
+    >("/api/v1/auth/refresh");
+    const { accessToken } = (await refreshResponse.data).data;
+    localStorage.setItem("access_token", accessToken);
 
-        //     "\n:: handleGetCurrentUserApi => token: ",
-        //     refreshResponseData.accessToken
-        // );
-        localStorage.setItem("access_token", refreshResponseData.accessToken);
-
-        const currentUserResponse = await axiosInstance.get<
-            Promise<IAxiosResponseData>
-        >("/api/v1/users/current-user");
-        const currentUserResponseData = (await currentUserResponse.data)
-            .data as IUserData;
-        return currentUserResponseData;
-    } catch (error) {
-        //     "\n:: Error => users.api => handleGetCurrentUserApi: ",
-        //     error
-        // );
-        throw error as string;
-    }
+    const currentUserResponse = await axiosInstance.get<
+        null,
+        AxiosResponse<Promise<IAxiosResponseData<IUserData>>>
+    >("/api/v1/users/current-user");
+    const currentUser = (await currentUserResponse.data).data;
+    const message = (await currentUserResponse.data).message;
+    return { currentUser, message };
 };
 
-// handle signout
+/*
+==============================================
+API - SIGNOUT
+==============================================
+ */
 export const handleSignoutApi = async () => {
-    try {
-        const refreshResponse = await axiosInstance.get<
-            Promise<IAxiosResponseData>
-        >("/api/v1/auth/refresh");
-        const refreshResponseData = (await refreshResponse.data)
-            .data as IAccessToken;
+    const refreshResponse = await axiosInstance.get<
+        null,
+        AxiosResponse<Promise<IAxiosResponseData<IAccessToken>>>
+    >("/api/v1/auth/refresh");
+    const { accessToken } = (await refreshResponse.data).data;
+    localStorage.setItem("access_token", accessToken);
 
-        //     "\n:: handleGetCurrentUserApi => token: ",
-        //     refreshResponseData.accessToken
-        // );
-        localStorage.setItem("access_token", refreshResponseData.accessToken);
+    const signoutResponse = await axiosInstance.post<
+        null,
+        AxiosResponse<Promise<IAxiosResponseData<null>>>
+    >("/api/v1/auth/signout");
+    const message = (await signoutResponse.data).message;
+    return { message };
+};
 
-        const signoutResponse = await axiosInstance.post<
-            Promise<IAxiosResponseData>
-        >("/api/v1/auth/signout");
-        return await signoutResponse.data;
-    } catch (error) {
-        throw error as string;
-    }
+/*
+==============================================
+API - CHANGE PASSWORD
+==============================================
+ */
+export const handleChangePasswordApi = async (data: IChangePasswordPayload) => {
+    const refreshResponse = await axiosInstance.get<
+        null,
+        AxiosResponse<Promise<IAxiosResponseData<IAccessToken>>>
+    >("/api/v1/auth/refresh");
+    const { accessToken } = (await refreshResponse.data).data;
+    localStorage.setItem("access_token", accessToken);
+
+    const changePasswordApiResponse = await axiosInstance.put<
+        null,
+        AxiosResponse<Promise<IAxiosResponseData<null>>>
+    >("/api/v1/auth/change-password", data);
+    const message = (await changePasswordApiResponse.data).message;
+    return { message };
+};
+
+/*
+==============================================
+API - VERIFY EMAIL
+==============================================
+ */
+export const handleVerifyEmailApi = async (data: IVerifyEmailPayload) => {
+    const verifyEmailApiResponse = await axiosInstance.post<
+        null,
+        AxiosResponse<Promise<IAxiosResponseData<IEmail>>>
+    >("/api/v1/auth/verify-email", data);
+    const email = (await verifyEmailApiResponse.data).data.email;
+    const message = (await verifyEmailApiResponse.data).message;
+    return { email, message };
+};
+
+/*
+==============================================
+API - VERIFY OTP
+==============================================
+ */
+export const handleVerifyOTPApi = async (otp: string) => {
+    const verifyOTPResponse = await axiosInstance.post<
+        null,
+        AxiosResponse<Promise<IAxiosResponseData<null>>>
+    >("/api/v1/auth/verify-otp", { otp });
+    const message = (await verifyOTPResponse.data).message;
+    return { message };
+};
+
+/*
+==============================================
+API - RESET PASSWORD
+==============================================
+ */
+export const handleResetPasswordApi = async (
+    data: IResetPasswordApiPayload
+) => {
+    const resetPasswordResponse = await axiosInstance.put<
+        null,
+        AxiosResponse<Promise<IAxiosResponseData<null>>>
+    >("/api/v1/auth/reset-password", data);
+    const message = (await resetPasswordResponse.data).message;
+    return { message };
 };

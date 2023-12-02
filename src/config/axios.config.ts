@@ -1,11 +1,11 @@
-import { envConfig } from "./env.config";
-import { IAxiosError } from "src/types/axios.types";
 import axios, {
     AxiosError,
     AxiosInstance,
     AxiosResponse,
     InternalAxiosRequestConfig,
 } from "axios";
+import { envConfig } from "./env.config";
+import { IAxiosError } from "src/types/axios.types";
 
 const axiosInstance: AxiosInstance = axios.create({
     baseURL: envConfig.backendBaseURI,
@@ -33,27 +33,22 @@ axiosInstance.interceptors.request.use(
 // Add response interceptor for better error handling
 axiosInstance.interceptors.response.use(
     (response: AxiosResponse) => {
-        console.log("\n:: response interceptor => response: ", response);
         return response;
     },
     (error: AxiosError<IAxiosError>): Promise<string> => {
-        console.log("\n:: Error: ", error);
         if (error.response) {
             if (
                 error.response.status === 401 ||
                 error.response.status === 403
             ) {
-                localStorage.setItem("isLoggedIn", "false");
+                localStorage.setItem("isSignedIn", "false");
             }
             error.message = error.response.data.message;
-        } else if (error.request) {
-            // Handle network-related errors (e.g., no internet connection)
-            console.error("\n:: Network Error:", error.message);
-        } else {
-            // Handle other errors
-            console.error("\n:: Error:", error.message);
         }
-        return Promise.reject(error.message);
+        if (!error.message) {
+            error.message = "Something went wrong.";
+        }
+        return Promise.reject(error);
     }
 );
 

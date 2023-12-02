@@ -17,7 +17,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
 
     useEffect(() => {
         if (isSignedIn !== "true") {
-            navigate("/signin", { state: { from: location.pathname } });
+            navigate("/auth/signin", { state: { from: location.pathname } });
         }
     }, [navigate, isSignedIn, location.pathname]);
 

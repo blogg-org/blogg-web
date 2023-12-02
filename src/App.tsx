@@ -2,23 +2,24 @@ import React, { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { Outlet } from "react-router-dom";
 import { allPosts } from "@store/slice/blogsSlice";
-import { getLoginStatus } from "@store/slice/authSlice";
 import { Header, Footer, Container } from "@components/index";
 import { useAppDispatch, useAppSelector } from "@store/store";
+import { currentUser, getLoginStatus } from "@store/slice/authSlice";
 
 const App: React.FC = () => {
     const dispatch = useAppDispatch();
-    const isLoggedIn = useAppSelector(getLoginStatus);
+    const isSignedIn = useAppSelector(getLoginStatus) === "true";
 
-    // fetch all posts while the app is loading only when the user is logged in
+    // fetch current user and all posts while the app is loading if and only if when the user is logged in
     useEffect(() => {
         // IIFE
         (async () => {
-            if (isLoggedIn === "true") {
+            if (isSignedIn) {
+                await dispatch(currentUser());
                 await dispatch(allPosts());
             }
         })();
-    }, [isLoggedIn, dispatch]);
+    }, [isSignedIn, dispatch]);
 
     return (
         <div className="relative min-w-screen min-h-screen flex flex-col justify-between">
