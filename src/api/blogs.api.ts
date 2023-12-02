@@ -3,9 +3,9 @@ import {
     IPostFormData,
     IUpdatePostArgs,
 } from "src/types/blogs.types";
+import { AxiosResponse } from "axios";
 import axiosInstance from "@config/axios.config";
 import { IAccessToken, IAxiosResponseData } from "src/types/axios.types";
-import { AxiosResponse } from "axios";
 
 /*
 ==============================================

@@ -6,11 +6,11 @@ import {
     ErrorInputMessage,
 } from "@components/index";
 import React, { useState } from "react";
-import { useAppDispatch, useAppSelector } from "@store/store";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { useAuthToast } from "@hooks/useAuthToast";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useAppDispatch, useAppSelector } from "@store/store";
 import { getVerifiedEmail, resetPassword } from "@store/slice/authSlice";
 import { resetPasswordSchema } from "@form-validations/resetPassword.schema";
 import { AuthStateStatus, IResetPasswordPayload } from "src/types/auth.types";
@@ -37,7 +37,6 @@ const ResetPassword: React.FC = () => {
     };
 
     const handleResetPassword = async (data: IResetPasswordPayload) => {
-        console.log(data);
         setResetPasswordStatus("loading");
         const response = await dispatch(
             resetPassword({ ...data, email: verifiedEmail })

@@ -51,7 +51,6 @@ export const signin = createAsyncThunk(
     "auth/signin",
     async (data: ISigninPayload) => {
         const response = await handleSigninApi(data);
-        console.log("response authslice signin: ", response.accessToken);
         localStorage.setItem("access_token", response.accessToken);
         localStorage.setItem("isSignedIn", "true");
         return response.message;
