@@ -1,5 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { usePostToast } from "@hooks/usePostToast";
 import { getAuthData } from "@store/slice/authSlice";
 import { AuthStateStatus } from "src/types/auth.types";
 import { useDocumentTitle } from "@hooks/useDocumentTitle";
@@ -8,7 +9,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { IPostFormData, IPostFromDB } from "src/types/blogs.types";
 import { createNewPost, updatePost } from "@store/slice/blogsSlice";
 import { Button, Input, RealTimeEditor, Select } from "@components/index";
-import { usePostToast } from "@hooks/usePostToast";
 
 interface PostFormProps {
     post?: IPostFromDB;

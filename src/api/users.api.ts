@@ -11,8 +11,8 @@ import {
     IChangePasswordPayload,
     IResetPasswordApiPayload,
 } from "src/types/auth.types";
-import axiosInstance from "@config/axios.config";
 import { AxiosResponse } from "axios";
+import axiosInstance from "@config/axios.config";
 
 /*
 ==============================================
