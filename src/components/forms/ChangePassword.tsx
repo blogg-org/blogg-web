@@ -1,10 +1,3 @@
-import {
-    Logo,
-    Input,
-    Button,
-    CustomLink,
-    ErrorInputMessage,
-} from "@components/index";
 import React, { useState } from "react";
 import { useAppDispatch } from "@store/store";
 import { LuEye, LuEyeOff } from "react-icons/lu";
@@ -12,6 +5,7 @@ import { useAuthToast } from "@hooks/useAuthToast";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { changePassword } from "@store/slice/authSlice";
+import { Logo, Input, Button, ErrorInputMessage } from "@components/index";
 import { AuthStateStatus, IChangePasswordPayload } from "src/types/auth.types";
 import { changePasswordSchema } from "@form-validations/changePassword.schema";
 
@@ -165,11 +159,6 @@ const ChangePassword: React.FC = () => {
                         </Button>
                     </div>
                 </form>
-                <div className="w-full text-center mt-4">
-                    <CustomLink to="/auth/verify-email">
-                        Forgot Password?
-                    </CustomLink>
-                </div>
             </div>
         </div>
     );
