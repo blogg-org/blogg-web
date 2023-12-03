@@ -44,13 +44,16 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                 className="flex justify-center items-center rounded-full border-4 border-white group-hover:border-blue-400 transition-colors duration-200 ease-in"
                 title="Menu"
             >
-                <img
-                    src={defaultUserIcon}
-                    alt="avatar"
-                    width={40}
-                    height={40}
-                    className="bg-white rounded-full"
-                />
+                <div className="relative w-9 h-9 rounded-full bg-blue-50 overflow-hidden">
+                    <div
+                        style={{
+                            backgroundImage: `url(${
+                                authData.avatar?.url ?? defaultUserIcon
+                            })`,
+                        }}
+                        className="absolute inset-0 rounded-full bg-cover bg-center"
+                    ></div>
+                </div>
             </Menu.Button>
             <Transition
                 as={Fragment}
