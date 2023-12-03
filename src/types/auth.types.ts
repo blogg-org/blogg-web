@@ -42,6 +42,11 @@ export interface IUserData {
     _id: string;
     fullname: string;
     email: string;
+    avatar: {
+        _id?: string;
+        publicId?: string;
+        url: string;
+    };
     __v: number;
     createdAt: string;
     updatedAt: string;
