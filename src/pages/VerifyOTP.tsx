@@ -3,13 +3,13 @@ import { VerifyOTP as VerifyOTPFrom } from "@components/index";
 import { useDocumentTitle } from "@hooks/useDocumentTitle";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "@store/store";
-import { getLoginStatus } from "@store/slice/authSlice";
+import { getSigninStatus } from "@store/slice/authSlice";
 
 const VerifyOTP: React.FC = () => {
     useDocumentTitle("blogg - Verify OTP");
 
     const navigate = useNavigate();
-    const isSignedIn = useAppSelector(getLoginStatus) === "true";
+    const isSignedIn = useAppSelector(getSigninStatus) === "true";
 
     useEffect(() => {
         if (isSignedIn) {

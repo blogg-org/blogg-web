@@ -21,6 +21,7 @@ import VerifyEmail from "./forms/VerifyEmail";
 import ResetPassword from "./forms/ResetPassword";
 import ErrorInputMessage from "./ErrorInputMessage";
 import ChangePassword from "./forms/ChangePassword";
+import SigninWithGoogle from "./SigninWithGoogle";
 
 export {
     Logo,
@@ -46,4 +47,5 @@ export {
     GoBackButton,
     VerifyOTP,
     ResetPassword,
+    SigninWithGoogle,
 };

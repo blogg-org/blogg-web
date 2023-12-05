@@ -12,12 +12,12 @@ export const usePostToast = (status: AuthStateStatus, path = "") => {
 
     useEffect(() => {
         if (status === "succeeded") {
-            toast.success(postsMessage, { duration: 5000 });
+            toast.success(postsMessage);
             if (path) {
                 navigate(path);
             }
         } else if (status === "failed") {
-            toast.error(postsError, { duration: 5000 });
+            toast.error(postsError);
         }
     }, [postsError, postsMessage, navigate, status, path]);
 };

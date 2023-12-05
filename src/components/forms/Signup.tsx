@@ -4,6 +4,7 @@ import {
     Button,
     CustomLink,
     ErrorInputMessage,
+    SigninWithGoogle,
 } from "@components/index";
 import { useState } from "react";
 import { useAppDispatch } from "@store/store";
@@ -48,7 +49,7 @@ const Signup: React.FC = () => {
         }
     };
 
-    useAuthToast(signupStatus, "/auth/signin");
+    useAuthToast(signupStatus);
 
     return (
         <div className="flex items-center justify-center">
@@ -67,6 +68,12 @@ const Signup: React.FC = () => {
                     Already have an account?&nbsp;
                     <CustomLink to="/auth/signin">Sign in</CustomLink>
                 </p>
+                <div className="w-full flex justify-center mt-6">
+                    <SigninWithGoogle />
+                </div>
+                <div className="w-full text-center text-lg font-medium text-blue-950 mt-6">
+                    -OR-
+                </div>
                 <form onSubmit={handleSubmit(handleSignup)} className="mt-2">
                     <div className="space-y-5">
                         {/* fullname */}

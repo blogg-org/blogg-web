@@ -6,7 +6,7 @@ import { resetPosts } from "@store/slice/blogsSlice";
 import { AuthStateStatus } from "src/types/auth.types";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@store/store";
-import { signout, getAuthData, getLoginStatus } from "@store/slice/authSlice";
+import { signout, getAuthData, getSigninStatus } from "@store/slice/authSlice";
 
 interface AvatarProps {
     showLink: boolean;
@@ -15,7 +15,7 @@ interface AvatarProps {
 const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const isSignedIn = useAppSelector(getLoginStatus) === "true";
+    const isSignedIn = useAppSelector(getSigninStatus) === "true";
     const authData = useAppSelector(getAuthData);
     const [logoutStatus, setLogoutStatus] = useState<AuthStateStatus>("idle");
 

@@ -7,6 +7,7 @@ import {
     handleResetPasswordApi,
     handleGetCurrentUserApi,
     handleChangePasswordApi,
+    handleSigninWithGoogleApi,
 } from "@api/users.api";
 import {
     IUserData,
@@ -22,7 +23,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 interface IInitialState {
     status: "idle" | "loading" | "succeeded" | "failed";
     data: IUserData;
-    isLoggedIn: string;
+    isSignedIn: string;
     verifiedEmail: string;
     message: string;
     error: string;
@@ -31,7 +32,7 @@ interface IInitialState {
 const initialState: IInitialState = {
     status: "idle",
     data: {} as IUserData,
-    isLoggedIn: localStorage.getItem("isSignedIn") ?? "false",
+    isSignedIn: localStorage.getItem("isSignedIn") ?? "false",
     verifiedEmail: "",
     message: "",
     error: "",
@@ -51,6 +52,17 @@ export const signin = createAsyncThunk(
     "auth/signin",
     async (data: ISigninPayload) => {
         const response = await handleSigninApi(data);
+        localStorage.setItem("access_token", response.accessToken);
+        localStorage.setItem("isSignedIn", "true");
+        return response.message;
+    }
+);
+
+// signin with google
+export const signinWithGoogle = createAsyncThunk(
+    "auth/google",
+    async (code: string) => {
+        const response = await handleSigninWithGoogleApi(code);
         localStorage.setItem("access_token", response.accessToken);
         localStorage.setItem("isSignedIn", "true");
         return response.message;
@@ -143,10 +155,28 @@ const authSlice = createSlice({
                 state.status = "succeeded";
                 state.data = {} as IUserData;
                 state.message = action.payload;
-                state.isLoggedIn = "true";
+                state.isSignedIn = "true";
                 state.error = "";
             })
             .addCase(signin.rejected, (state, action) => {
+                state.status = "failed";
+                state.data = {} as IUserData;
+                state.message = "";
+                state.error = action.error.message!;
+            })
+
+            // signin with google
+            .addCase(signinWithGoogle.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(signinWithGoogle.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                state.data = {} as IUserData;
+                state.message = action.payload;
+                state.isSignedIn = "true";
+                state.error = "";
+            })
+            .addCase(signinWithGoogle.rejected, (state, action) => {
                 state.status = "failed";
                 state.data = {} as IUserData;
                 state.message = "";
@@ -177,7 +207,7 @@ const authSlice = createSlice({
             .addCase(signout.fulfilled, (state, action) => {
                 state.status = "succeeded";
                 state.data = {} as IUserData;
-                state.isLoggedIn = "false";
+                state.isSignedIn = "false";
                 state.message = action.payload.message;
                 state.error = "";
             })
@@ -257,8 +287,8 @@ export const getAuthStatus = (state: typeof rootState) => state.auth.status;
 export const getAuthMessage = (state: typeof rootState) => state.auth.message;
 export const getAuthData = (state: typeof rootState) => state.auth.data;
 export const getAuthError = (state: typeof rootState) => state.auth.error;
-export const getLoginStatus = (state: typeof rootState) =>
-    state.auth.isLoggedIn;
+export const getSigninStatus = (state: typeof rootState) =>
+    state.auth.isSignedIn;
 export const getVerifiedEmail = (state: typeof rootState) =>
     state.auth.verifiedEmail;
 

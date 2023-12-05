@@ -1,11 +1,11 @@
 import { useAppSelector } from "@store/store";
 import { Link, NavLink } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { getLoginStatus } from "@store/slice/authSlice";
+import { getSigninStatus } from "@store/slice/authSlice";
 import { Container, Logo, Avatar } from "@components/index";
 
 const Header: React.FC = () => {
-    const isSignedIn = useAppSelector(getLoginStatus) === "true";
+    const isSignedIn = useAppSelector(getSigninStatus) === "true";
     const [showLink, setShowLink] = useState(true);
 
     const checkWindowWidth = () => {

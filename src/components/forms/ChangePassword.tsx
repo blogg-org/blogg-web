@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "@store/store";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { useAuthToast } from "@hooks/useAuthToast";
@@ -8,9 +8,11 @@ import { changePassword } from "@store/slice/authSlice";
 import { Logo, Input, Button, ErrorInputMessage } from "@components/index";
 import { AuthStateStatus, IChangePasswordPayload } from "src/types/auth.types";
 import { changePasswordSchema } from "@form-validations/changePassword.schema";
+import { useNavigate } from "react-router-dom";
 
 const ChangePassword: React.FC = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const [changePasswordStatus, setChangePasswordStatus] =
         useState<AuthStateStatus>("idle");
     const { control, handleSubmit } = useForm<IChangePasswordPayload>({
@@ -41,6 +43,11 @@ const ChangePassword: React.FC = () => {
     };
 
     useAuthToast(changePasswordStatus, "/");
+    useEffect(() => {
+        if (changePasswordStatus === "succeeded") {
+            navigate("/");
+        }
+    }, [changePasswordStatus, navigate]);
 
     return (
         <div className="flex items-center justify-center w-full">
