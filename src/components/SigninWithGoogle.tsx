@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { Button } from "@components/index";
-import { useGoogleLogin } from "@react-oauth/google";
-import { FcGoogle } from "react-icons/fc";
-import { useAppDispatch, useAppSelector } from "@store/store";
 import {
     getAuthError,
     getAuthMessage,
     signinWithGoogle,
 } from "@store/slice/authSlice";
-import { AuthStateStatus } from "src/types/auth.types";
 import toast from "react-hot-toast";
+import { FcGoogle } from "react-icons/fc";
+import { Button } from "@components/index";
+import React, { useEffect, useState } from "react";
+import { useGoogleLogin } from "@react-oauth/google";
+import { AuthStateStatus } from "src/types/auth.types";
+import { useAppDispatch, useAppSelector } from "@store/store";
 
 const SigninWithGoogle: React.FC = () => {
     const dispatch = useAppDispatch();
