@@ -4,11 +4,11 @@ import { Outlet } from "react-router-dom";
 import { allPosts } from "@store/slice/blogsSlice";
 import { Header, Footer, Container } from "@components/index";
 import { useAppDispatch, useAppSelector } from "@store/store";
-import { currentUser, getLoginStatus } from "@store/slice/authSlice";
+import { currentUser, getSigninStatus } from "@store/slice/authSlice";
 
 const App: React.FC = () => {
     const dispatch = useAppDispatch();
-    const isSignedIn = useAppSelector(getLoginStatus) === "true";
+    const isSignedIn = useAppSelector(getSigninStatus) === "true";
 
     // fetch current user and all posts while the app is loading if and only if when the user is logged in
     useEffect(() => {
@@ -30,7 +30,7 @@ const App: React.FC = () => {
                 </Container>
             </main>
             <Footer />
-            <Toaster reverseOrder={false} />
+            <Toaster reverseOrder={false} toastOptions={{ duration: 5000 }} />
         </div>
     );
 };

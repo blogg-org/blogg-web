@@ -4,6 +4,7 @@ import {
     Button,
     CustomLink,
     ErrorInputMessage,
+    SigninWithGoogle,
 } from "@components/index";
 import { useState } from "react";
 import { useAppDispatch } from "@store/store";
@@ -62,7 +63,13 @@ const Signin: React.FC = () => {
                     Don&apos;t have any account?&nbsp;
                     <CustomLink to="/auth/signup">Sign up</CustomLink>
                 </p>
-                <form onSubmit={handleSubmit(handleLogin)} className="mt-8">
+                <div className="w-full flex justify-center mt-6">
+                    <SigninWithGoogle />
+                </div>
+                <div className="w-full text-center text-lg font-medium text-blue-950 mt-6">
+                    -OR-
+                </div>
+                <form onSubmit={handleSubmit(handleLogin)} className="mt-6">
                     <div className="space-y-5">
                         <Controller
                             name="email"

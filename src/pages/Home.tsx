@@ -2,10 +2,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Posts } from "@components/index";
 import { useAppSelector } from "@store/store";
-import { getLoginStatus } from "@store/slice/authSlice";
+import { getSigninStatus } from "@store/slice/authSlice";
 
 const Home: React.FC = () => {
-    const isLoggedIn = useAppSelector(getLoginStatus);
+    const isLoggedIn = useAppSelector(getSigninStatus);
 
     if (isLoggedIn === "false") {
         return (

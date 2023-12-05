@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { VerifyEmail as VerifyEmailForm } from "@components/index";
 import { useDocumentTitle } from "@hooks/useDocumentTitle";
 import { useAppDispatch, useAppSelector } from "@store/store";
-import { getLoginStatus, resetVerifiedEmail } from "@store/slice/authSlice";
+import { getSigninStatus, resetVerifiedEmail } from "@store/slice/authSlice";
 import { useNavigate } from "react-router-dom";
 
 const VerifyEmail: React.FC = () => {
@@ -10,7 +10,7 @@ const VerifyEmail: React.FC = () => {
 
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const isSignedIn = useAppSelector(getLoginStatus) === "true";
+    const isSignedIn = useAppSelector(getSigninStatus) === "true";
 
     useEffect(() => {
         dispatch(resetVerifiedEmail());

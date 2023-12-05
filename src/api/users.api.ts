@@ -48,6 +48,24 @@ export const handleSigninApi = async (data: ISigninPayload) => {
 
 /*
 ==============================================
+API - SIGNIN WITH GOOGLE
+==============================================
+ */
+export const handleSigninWithGoogleApi = async (code: string) => {
+    const response = await axiosInstance.post<
+        null,
+        AxiosResponse<Promise<IAxiosResponseData<IAccessToken>>>
+    >(`/api/v1/auth/google`, { code });
+    const { accessToken } = (await response.data).data;
+    const message = (await response.data).message;
+    return {
+        accessToken,
+        message,
+    };
+};
+
+/*
+==============================================
 API - GET CURRENT USER
 ==============================================
  */

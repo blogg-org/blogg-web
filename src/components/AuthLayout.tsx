@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useAppSelector } from "@store/store";
-import { getLoginStatus } from "@store/slice/authSlice";
+import { getSigninStatus } from "@store/slice/authSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 
 interface AuthLayoutProps {
@@ -13,7 +13,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
 }: AuthLayoutProps) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const isSignedIn = useAppSelector(getLoginStatus);
+    const isSignedIn = useAppSelector(getSigninStatus);
 
     useEffect(() => {
         if (isSignedIn !== "true") {
