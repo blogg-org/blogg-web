@@ -2,7 +2,7 @@ import {
     IPostFromDB,
     IPostFormData,
     IUpdatePostArgs,
-} from "src/types/blogs.types";
+} from "src/types/posts.types";
 import { AxiosResponse } from "axios";
 import axiosInstance from "@config/axios.config";
 import { IAccessToken, IAxiosResponseData } from "src/types/axios.types";

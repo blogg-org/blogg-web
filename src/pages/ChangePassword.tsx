@@ -1,5 +1,5 @@
-import { useDocumentTitle } from "@hooks/useDocumentTitle";
 import React from "react";
+import { useDocumentTitle } from "@hooks/useDocumentTitle";
 import { ChangePassword as ChangePasswordForm } from "@components/index";
 
 const ChangePassword: React.FC = () => {

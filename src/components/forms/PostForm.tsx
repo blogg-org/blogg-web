@@ -1,13 +1,21 @@
+import {
+    IPostFromDB,
+    IPostFormData,
+    PostsStateStatus,
+} from "src/types/posts.types";
+import {
+    updatePost,
+    createNewPost,
+    getPostsError,
+    getPostsMessage,
+} from "@store/slice/postsSlice";
+import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { usePostToast } from "@hooks/usePostToast";
 import { getAuthData } from "@store/slice/authSlice";
-import { AuthStateStatus } from "src/types/auth.types";
 import { useDocumentTitle } from "@hooks/useDocumentTitle";
 import { useAppDispatch, useAppSelector } from "@store/store";
 import React, { useCallback, useEffect, useState } from "react";
-import { IPostFormData, IPostFromDB } from "src/types/blogs.types";
-import { createNewPost, updatePost } from "@store/slice/blogsSlice";
 import { Button, Input, RealTimeEditor, Select } from "@components/index";
 
 interface PostFormProps {
@@ -20,8 +28,10 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const user = useAppSelector(getAuthData);
+    const postsMessage = useAppSelector(getPostsMessage);
+    const postsError = useAppSelector(getPostsError);
     const [postFormStatus, setPostFormStatus] =
-        useState<AuthStateStatus>("idle");
+        useState<PostsStateStatus>("idle");
     const [newPost, setNewPost] = useState<IPostFormData>({} as IPostFormData);
 
     const { register, handleSubmit, control, watch, setValue, getValues } =
@@ -44,34 +54,35 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
 
     const submitPost = async (data: IPostFormData) => {
         setPostFormStatus("loading");
-        if (post) {
-            const response = await dispatch(
-                updatePost({ oldPost: post, data })
-            );
+        let response;
 
-            if (response && response.meta.requestStatus === "fulfilled") {
+        // if post exists, then update otherwise create a new post
+        if (post) {
+            response = await dispatch(updatePost({ oldPost: post, data }));
+        } else {
+            response = await dispatch(createNewPost(data));
+        }
+        if (response) {
+            if (response.meta.requestStatus === "fulfilled") {
                 setNewPost(data);
                 setPostFormStatus("succeeded");
-            } else if (response && response.meta.requestStatus === "rejected") {
-                setPostFormStatus("failed");
             } else {
-                setPostFormStatus("idle");
+                setPostFormStatus("failed");
             }
         } else {
-            const response = await dispatch(createNewPost(data));
-
-            if (response && response.meta.requestStatus === "fulfilled") {
-                setNewPost(data);
-                setPostFormStatus("succeeded");
-            } else if (response && response.meta.requestStatus === "rejected") {
-                setPostFormStatus("failed");
-            } else {
-                setPostFormStatus("idle");
-            }
+            setPostFormStatus("idle");
         }
     };
 
-    usePostToast(postFormStatus, `/posts/${newPost.slug}`);
+    useEffect(() => {
+        if (postFormStatus === "succeeded") {
+            toast.success(postsMessage);
+            navigate(`/posts/${newPost.slug}`);
+        }
+        if (postFormStatus === "failed") {
+            toast.error(postsError);
+        }
+    }, [postFormStatus, navigate, postsError, postsMessage, newPost.slug]);
 
     // handle cancel button click
     const handleCancelButtonClick = () => {

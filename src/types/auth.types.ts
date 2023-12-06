@@ -1,53 +1,54 @@
 import { Location } from "react-router-dom";
 
-export interface IAuthStateStatus {
-    state: "idle" | "loading" | "succeeded" | "failed";
-}
+export type StateStatus = "idle" | "loading" | "succeeded" | "failed";
+export type AuthStateStatus = StateStatus;
 
-export type AuthStateStatus = "idle" | "loading" | "succeeded" | "failed";
+export type Message = string;
+export type Email = string;
+export type Password = string;
 
 export interface ISignupPayload {
     fullname: string;
-    email: string;
-    password: string;
+    email: Email;
+    password: Password;
 }
 
 export interface ISignupResponse {
-    message: string;
+    message: Message;
 }
 
 export interface ISigninPayload {
-    email: string;
-    password: string;
+    email: Email;
+    password: Password;
 }
 
 export interface IChangePasswordPayload {
-    oldPassword: string;
-    newPassword: string;
+    oldPassword: Password;
+    newPassword: Password;
 }
 
 export interface IVerifyEmailPayload {
-    email: string;
+    email: Email;
 }
 
 export interface IResetPasswordPayload {
-    newPassword: string;
+    newPassword: Password;
 }
 
-export interface IResetPasswordApiPayload extends IResetPasswordPayload {
-    email: string;
+export interface IResetPasswordApiPayload {
+    email: Email;
+    newPassword: Password;
 }
 
 export interface IUserData {
     _id: string;
     fullname: string;
-    email: string;
+    email: Email;
     avatar?: {
         _id?: string;
         publicId?: string;
         url: string;
     };
-    __v: number;
     createdAt: string;
     updatedAt: string;
 }

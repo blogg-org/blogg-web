@@ -9,7 +9,7 @@ const ResetPassword: React.FC = () => {
     useDocumentTitle("blogg - Reset Password");
 
     const navigate = useNavigate();
-    const isSignedIn = useAppSelector(getSigninStatus) === "true";
+    const isSignedIn = useAppSelector(getSigninStatus);
 
     useEffect(() => {
         if (isSignedIn) {

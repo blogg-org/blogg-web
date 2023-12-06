@@ -14,7 +14,7 @@ const Login: React.FC = () => {
     const isSignedIn = useAppSelector(getSigninStatus);
 
     useEffect(() => {
-        if (isSignedIn === "true") {
+        if (isSignedIn) {
             navigate(location.state?.from ?? "/");
         }
     }, [navigate, isSignedIn, location.state?.from]);

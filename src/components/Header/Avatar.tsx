@@ -1,12 +1,18 @@
-import React, { Fragment, useState } from "react";
-import { useAuthToast } from "@hooks/useAuthToast";
+import {
+    signout,
+    getAuthData,
+    getAuthError,
+    getAuthMessage,
+    getSigninStatus,
+} from "@store/slice/authSlice";
+import toast from "react-hot-toast";
 import { Menu, Transition } from "@headlessui/react";
 import defaultUserIcon from "@assets/user-alien.svg";
-import { resetPosts } from "@store/slice/blogsSlice";
+import { resetPosts } from "@store/slice/postsSlice";
 import { AuthStateStatus } from "src/types/auth.types";
 import { NavLink, useNavigate } from "react-router-dom";
+import React, { Fragment, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@store/store";
-import { signout, getAuthData, getSigninStatus } from "@store/slice/authSlice";
 
 interface AvatarProps {
     showLink: boolean;
@@ -15,28 +21,40 @@ interface AvatarProps {
 const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const isSignedIn = useAppSelector(getSigninStatus) === "true";
+    const authMessage = useAppSelector(getAuthMessage);
+    const authError = useAppSelector(getAuthError);
+    const isSignedIn = useAppSelector(getSigninStatus);
     const authData = useAppSelector(getAuthData);
-    const [logoutStatus, setLogoutStatus] = useState<AuthStateStatus>("idle");
+    const [signoutStatus, setSignoutStatus] = useState<AuthStateStatus>("idle");
 
     const handleChangePasswordButtonClick = () => {
         navigate("/auth/change-password");
     };
 
-    const handleLogout = async () => {
-        setLogoutStatus("loading");
+    const handleSignout = async () => {
+        setSignoutStatus("loading");
         const response = await dispatch(signout());
-        if (response && response.meta.requestStatus === "fulfilled") {
-            setLogoutStatus("succeeded");
-            dispatch(resetPosts());
-        } else if (response && response.meta.requestStatus === "rejected") {
-            setLogoutStatus("failed");
+        if (response) {
+            if (response.meta.requestStatus === "fulfilled") {
+                dispatch(resetPosts());
+                setSignoutStatus("succeeded");
+            } else {
+                setSignoutStatus("failed");
+            }
         } else {
-            setLogoutStatus("idle");
+            setSignoutStatus("idle");
         }
     };
 
-    useAuthToast(logoutStatus);
+    useEffect(() => {
+        if (signoutStatus === "succeeded") {
+            toast.success(authMessage);
+        }
+        if (signoutStatus === "failed") {
+            toast.error(authError);
+        }
+        setSignoutStatus("idle");
+    }, [signoutStatus, navigate, authError, authMessage]);
 
     return (
         <Menu as="div" className="group relative z-50">
@@ -137,7 +155,7 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                             <Menu.Item>
                                 {({ active }) => (
                                     <button
-                                        onClick={handleLogout}
+                                        onClick={handleSignout}
                                         className={`w-full p-2 border border-blue-500 rounded-md text-base transition-colors duration-200 ease-in disabled:cursor-not-allowed ${
                                             active && "bg-blue-500"
                                         }`}

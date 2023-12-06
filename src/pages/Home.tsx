@@ -5,9 +5,9 @@ import { useAppSelector } from "@store/store";
 import { getSigninStatus } from "@store/slice/authSlice";
 
 const Home: React.FC = () => {
-    const isLoggedIn = useAppSelector(getSigninStatus);
+    const isSignedIn = useAppSelector(getSigninStatus);
 
-    if (isLoggedIn === "false") {
+    if (!isSignedIn) {
         return (
             <div className="flex flex-wrap">
                 <div className="p-2 w-full flex flex-col items-center">
@@ -23,7 +23,7 @@ const Home: React.FC = () => {
                 </div>
             </div>
         );
-    } else if (isLoggedIn === "true") {
+    } else {
         return <Posts />;
     }
 };

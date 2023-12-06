@@ -1,3 +1,7 @@
+import { StateStatus } from "./auth.types";
+
+export type PostsStateStatus = StateStatus;
+
 export interface IPostFromDB {
     _id: string;
     title: string;
@@ -5,7 +9,7 @@ export interface IPostFromDB {
     content: string;
     featuredImage: {
         _id: string;
-        publicId: string;
+        publicId?: string;
         url: string;
     };
     status: "active" | "inactive";

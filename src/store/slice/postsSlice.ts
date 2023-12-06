@@ -10,10 +10,11 @@ import {
     IPostFormData,
     IPostFromDB,
     IUpdatePostArgs,
-} from "src/types/blogs.types";
+    PostsStateStatus,
+} from "src/types/posts.types";
 
 interface IInitialState {
-    status: "idle" | "loading" | "succeeded" | "failed";
+    status: PostsStateStatus;
     data: IPostFromDB[];
     message: string;
     error: string;

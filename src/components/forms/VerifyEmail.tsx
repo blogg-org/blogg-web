@@ -5,17 +5,25 @@ import {
     GoBackButton,
     ErrorInputMessage,
 } from "@components/index";
-import React, { useState } from "react";
-import { useAppDispatch } from "@store/store";
-import { useAuthToast } from "@hooks/useAuthToast";
-import { verifyEmail } from "@store/slice/authSlice";
+import {
+    verifyEmail,
+    getAuthError,
+    getAuthMessage,
+} from "@store/slice/authSlice";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useAppDispatch, useAppSelector } from "@store/store";
 import { verifyEmailSchema } from "@form-validations/verifyEmail.schema";
 import { AuthStateStatus, IVerifyEmailPayload } from "src/types/auth.types";
 
 const VerifyEmail: React.FC = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const authMessage = useAppSelector(getAuthMessage);
+    const authError = useAppSelector(getAuthError);
     const [verifyEmailStatus, setVerifyEmailStatus] =
         useState<AuthStateStatus>("idle");
     const { control, handleSubmit } = useForm<IVerifyEmailPayload>({
@@ -28,16 +36,26 @@ const VerifyEmail: React.FC = () => {
     const handleVerifyEmail = async (data: IVerifyEmailPayload) => {
         setVerifyEmailStatus("loading");
         const response = await dispatch(verifyEmail(data));
-        if (response && response.meta.requestStatus === "fulfilled") {
-            setVerifyEmailStatus("succeeded");
-        } else if (response && response.meta.requestStatus === "rejected") {
-            setVerifyEmailStatus("failed");
+        if (response) {
+            if (response.meta.requestStatus === "fulfilled") {
+                setVerifyEmailStatus("succeeded");
+            } else {
+                setVerifyEmailStatus("failed");
+            }
         } else {
             setVerifyEmailStatus("idle");
         }
     };
 
-    useAuthToast(verifyEmailStatus, "/auth/verify-otp");
+    useEffect(() => {
+        if (verifyEmailStatus === "succeeded") {
+            toast.success(authMessage);
+            navigate("/auth/verify-otp");
+        }
+        if (verifyEmailStatus === "failed") {
+            toast.error(authError);
+        }
+    }, [verifyEmailStatus, navigate, authError, authMessage]);
 
     return (
         <div className="flex items-center justify-center w-full">

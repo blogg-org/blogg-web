@@ -1,44 +1,72 @@
+import {
+    verifyOTP,
+    getAuthError,
+    getAuthMessage,
+    getVerifiedEmail,
+    verifyEmail,
+} from "@store/slice/authSlice";
+import toast from "react-hot-toast";
 import OTPInput from "react-otp-input";
-import { useAppDispatch } from "@store/store";
-import { verifyOTP } from "@store/slice/authSlice";
-import React, { FormEvent, useState } from "react";
-import { useAuthToast } from "@hooks/useAuthToast";
+import { useNavigate } from "react-router-dom";
 import { AuthStateStatus } from "src/types/auth.types";
+import { useAppDispatch, useAppSelector } from "@store/store";
+import React, { FormEvent, useEffect, useState } from "react";
 import { Button, GoBackButton, Logo } from "@components/index";
 
 const VerifyOTP: React.FC = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const authMessage = useAppSelector(getAuthMessage);
+    const authError = useAppSelector(getAuthError);
+    const verifiedEmail = useAppSelector(getVerifiedEmail);
     const [otp, setOtp] = useState("");
     const [isInputError, setIsInputError] = useState<boolean>(false);
     const [verifyOTPStatus, setVerifyOTPStatus] =
         useState<AuthStateStatus>("idle");
 
+    const handleResendOTPButtonClick = async () => {
+        const response = await dispatch(verifyEmail({ email: verifiedEmail }));
+        if (response) {
+            if (response.meta.requestStatus === "fulfilled") {
+                toast.success("New OTP is sent to your email.");
+            } else {
+                toast.error("Operation could not be performed.");
+            }
+        }
+    };
+
     const handleVerifyOTP = async (event: FormEvent) => {
         event.preventDefault();
         setVerifyOTPStatus("loading");
-        try {
-            if (!otp) {
-                setIsInputError(true);
-                setVerifyOTPStatus("idle");
+        if (!otp) {
+            setIsInputError(true);
+            setVerifyOTPStatus("idle");
+            return;
+        }
+        const response = await dispatch(verifyOTP(otp));
+        if (response) {
+            if (response.meta.requestStatus === "fulfilled") {
+                setOtp("");
+                setVerifyOTPStatus("succeeded");
             } else {
-                const response = await dispatch(verifyOTP(otp));
-                if (response && response.meta.requestStatus === "fulfilled") {
-                    setOtp("");
-                    setVerifyOTPStatus("succeeded");
-                } else if (
-                    response &&
-                    response.meta.requestStatus === "rejected"
-                ) {
-                    setIsInputError(true);
-                    setVerifyOTPStatus("failed");
-                }
+                setIsInputError(true);
+
+                setVerifyOTPStatus("failed");
             }
-        } catch (error) {
+        } else {
             setVerifyOTPStatus("idle");
         }
     };
 
-    useAuthToast(verifyOTPStatus, "/auth/reset-password");
+    useEffect(() => {
+        if (verifyOTPStatus === "succeeded") {
+            toast.success(authMessage);
+            navigate("/auth/reset-password");
+        }
+        if (verifyOTPStatus === "failed") {
+            toast.error(authError);
+        }
+    }, [verifyOTPStatus, navigate, authError, authMessage]);
 
     return (
         <div className="flex items-center justify-center w-full">
@@ -54,7 +82,19 @@ const VerifyOTP: React.FC = () => {
                     Verify OTP
                 </h2>
                 <p className="mt-2 text-center text-base text-black/60">
-                    Enter OTP recently sent to your email.
+                    <span>
+                        Enter OTP recently sent to your email. If you
+                        didn&apos;t get OTP in email or OTP is expired then
+                        click&nbsp;
+                    </span>
+                    <Button
+                        bgColor="bg-transparent"
+                        textColor="text-blue-800 hover:text-blue-950"
+                        className="px-0 py-0 underline"
+                        onClick={handleResendOTPButtonClick}
+                    >
+                        Resend OTP
+                    </Button>
                 </p>
                 <form onSubmit={handleVerifyOTP} className="mt-8">
                     <div className="space-y-5 ">

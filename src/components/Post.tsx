@@ -1,22 +1,30 @@
-import { useState } from "react";
+import {
+    deletePost,
+    getPostsError,
+    getPostFromSlug,
+    getPostsMessage,
+} from "@store/slice/postsSlice";
+import toast from "react-hot-toast";
 import parse from "html-react-parser";
 import { Button } from "@components/index";
-import { Link, useParams } from "react-router-dom";
-import { usePostToast } from "@hooks/usePostToast";
+import { useEffect, useState } from "react";
 import { getAuthData } from "@store/slice/authSlice";
-import { AuthStateStatus } from "src/types/auth.types";
+import { PostsStateStatus } from "src/types/posts.types";
 import { useDocumentTitle } from "@hooks/useDocumentTitle";
-import { deletePost, getPostFromSlug } from "@store/slice/blogsSlice";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { rootState, useAppDispatch, useAppSelector } from "@store/store";
 
 const Post: React.FC = () => {
     const { slug } = useParams();
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const postsMessage = useAppSelector(getPostsMessage);
+    const postsError = useAppSelector(getPostsError);
     const post = useAppSelector((state: typeof rootState) =>
         getPostFromSlug(state, slug!)
     );
     const user = useAppSelector(getAuthData);
-    const [postStatus, setPostStatus] = useState<AuthStateStatus>("idle");
+    const [postStatus, setPostStatus] = useState<PostsStateStatus>("idle");
 
     useDocumentTitle(post?.title ?? "blogg - Not found");
 
@@ -26,17 +34,26 @@ const Post: React.FC = () => {
     const handleDelete = async () => {
         setPostStatus("loading");
         const response = await dispatch(deletePost(post?._id ?? ""));
-
-        if (response && response.meta.requestStatus === "fulfilled") {
-            setPostStatus("succeeded");
-        } else if (response && response.meta.requestStatus === "rejected") {
-            setPostStatus("failed");
+        if (response) {
+            if (response.meta.requestStatus === "fulfilled") {
+                setPostStatus("succeeded");
+            } else {
+                setPostStatus("failed");
+            }
         } else {
             setPostStatus("idle");
         }
     };
 
-    usePostToast(postStatus, "/");
+    useEffect(() => {
+        if (postStatus === "succeeded") {
+            toast.success(postsMessage);
+            navigate("/");
+        }
+        if (postStatus === "failed") {
+            toast.error(postsError);
+        }
+    }, [postStatus, navigate, postsError, postsMessage]);
 
     if (post && Object.keys(post).length > 0) {
         return (

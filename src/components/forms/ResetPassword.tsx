@@ -5,18 +5,27 @@ import {
     GoBackButton,
     ErrorInputMessage,
 } from "@components/index";
-import React, { useState } from "react";
+import {
+    getAuthError,
+    resetPassword,
+    getAuthMessage,
+    getVerifiedEmail,
+} from "@store/slice/authSlice";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import { LuEye, LuEyeOff } from "react-icons/lu";
-import { useAuthToast } from "@hooks/useAuthToast";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAppDispatch, useAppSelector } from "@store/store";
-import { getVerifiedEmail, resetPassword } from "@store/slice/authSlice";
 import { resetPasswordSchema } from "@form-validations/resetPassword.schema";
 import { AuthStateStatus, IResetPasswordPayload } from "src/types/auth.types";
 
 const ResetPassword: React.FC = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const authMessage = useAppSelector(getAuthMessage);
+    const authError = useAppSelector(getAuthError);
     const verifiedEmail = useAppSelector(getVerifiedEmail);
     const [passwordType, setPasswordType] = useState<string>("password");
     const [resetPasswordStatus, setResetPasswordStatus] =
@@ -41,16 +50,26 @@ const ResetPassword: React.FC = () => {
         const response = await dispatch(
             resetPassword({ ...data, email: verifiedEmail })
         );
-        if (response && response.meta.requestStatus === "fulfilled") {
-            setResetPasswordStatus("succeeded");
-        } else if (response && response.meta.requestStatus === "rejected") {
-            setResetPasswordStatus("failed");
+        if (response) {
+            if (response.meta.requestStatus === "fulfilled") {
+                setResetPasswordStatus("succeeded");
+            } else {
+                setResetPasswordStatus("failed");
+            }
         } else {
             setResetPasswordStatus("idle");
         }
     };
 
-    useAuthToast(resetPasswordStatus, "/auth/signin");
+    useEffect(() => {
+        if (resetPasswordStatus === "succeeded") {
+            toast.success(authMessage);
+            navigate("/auth/signin");
+        }
+        if (resetPasswordStatus === "failed") {
+            toast.error(authError);
+        }
+    }, [resetPasswordStatus, navigate, authError, authMessage]);
 
     return (
         <div className="flex items-center justify-center w-full">

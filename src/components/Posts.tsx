@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { PostCard } from "@components/index";
 import { useAppSelector } from "@store/store";
-import { getAllPosts, getPostsStatus } from "@store/slice/blogsSlice";
+import { getAllPosts, getPostsStatus } from "@store/slice/postsSlice";
 
 const Posts: React.FC = () => {
     const posts = useAppSelector(getAllPosts);
