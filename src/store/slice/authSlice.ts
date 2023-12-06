@@ -16,14 +16,15 @@ import {
     IVerifyEmailPayload,
     IChangePasswordPayload,
     IResetPasswordApiPayload,
+    AuthStateStatus,
 } from "src/types/auth.types";
 import { rootState } from "@store/store";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 interface IInitialState {
-    status: "idle" | "loading" | "succeeded" | "failed";
+    status: AuthStateStatus;
     data: IUserData;
-    isSignedIn: string;
+    isSignedIn: boolean;
     verifiedEmail: string;
     message: string;
     error: string;
@@ -32,7 +33,7 @@ interface IInitialState {
 const initialState: IInitialState = {
     status: "idle",
     data: {} as IUserData,
-    isSignedIn: localStorage.getItem("isSignedIn") ?? "false",
+    isSignedIn: localStorage.getItem("isSignedIn") === "true",
     verifiedEmail: "",
     message: "",
     error: "",
@@ -155,7 +156,7 @@ const authSlice = createSlice({
                 state.status = "succeeded";
                 state.data = {} as IUserData;
                 state.message = action.payload;
-                state.isSignedIn = "true";
+                state.isSignedIn = true;
                 state.error = "";
             })
             .addCase(signin.rejected, (state, action) => {
@@ -173,7 +174,7 @@ const authSlice = createSlice({
                 state.status = "succeeded";
                 state.data = {} as IUserData;
                 state.message = action.payload;
-                state.isSignedIn = "true";
+                state.isSignedIn = true;
                 state.error = "";
             })
             .addCase(signinWithGoogle.rejected, (state, action) => {
@@ -207,7 +208,7 @@ const authSlice = createSlice({
             .addCase(signout.fulfilled, (state, action) => {
                 state.status = "succeeded";
                 state.data = {} as IUserData;
-                state.isSignedIn = "false";
+                state.isSignedIn = false;
                 state.message = action.payload.message;
                 state.error = "";
             })

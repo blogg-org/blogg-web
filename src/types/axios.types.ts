@@ -1,6 +1,3 @@
-// import { IUserData } from "./auth.types";
-// import { IPostFromDB } from "./blogs.types";
-
 export interface IAccessToken {
     accessToken: string;
 }

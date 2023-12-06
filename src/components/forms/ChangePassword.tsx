@@ -1,18 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { useAppDispatch } from "@store/store";
+import {
+    getAuthError,
+    changePassword,
+    getAuthMessage,
+} from "@store/slice/authSlice";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import { LuEye, LuEyeOff } from "react-icons/lu";
-import { useAuthToast } from "@hooks/useAuthToast";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { changePassword } from "@store/slice/authSlice";
+import { useAppDispatch, useAppSelector } from "@store/store";
 import { Logo, Input, Button, ErrorInputMessage } from "@components/index";
 import { AuthStateStatus, IChangePasswordPayload } from "src/types/auth.types";
 import { changePasswordSchema } from "@form-validations/changePassword.schema";
-import { useNavigate } from "react-router-dom";
 
 const ChangePassword: React.FC = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const authMessage = useAppSelector(getAuthMessage);
+    const authError = useAppSelector(getAuthError);
     const [changePasswordStatus, setChangePasswordStatus] =
         useState<AuthStateStatus>("idle");
     const { control, handleSubmit } = useForm<IChangePasswordPayload>({
@@ -35,19 +41,26 @@ const ChangePassword: React.FC = () => {
     const handleChangePassword = async (data: IChangePasswordPayload) => {
         setChangePasswordStatus("loading");
         const response = await dispatch(changePassword(data));
-        if (response && response.meta.requestStatus === "fulfilled") {
-            setChangePasswordStatus("succeeded");
-        } else if (response && response.meta.requestStatus === "rejected") {
-            setChangePasswordStatus("failed");
+        if (response) {
+            if (response.meta.requestStatus === "fulfilled") {
+                setChangePasswordStatus("succeeded");
+            } else {
+                setChangePasswordStatus("failed");
+            }
+        } else {
+            setChangePasswordStatus("idle");
         }
     };
 
-    useAuthToast(changePasswordStatus, "/");
     useEffect(() => {
         if (changePasswordStatus === "succeeded") {
+            toast.success(authMessage);
             navigate("/");
         }
-    }, [changePasswordStatus, navigate]);
+        if (changePasswordStatus === "failed") {
+            toast.error(authError);
+        }
+    }, [changePasswordStatus, navigate, authError, authMessage]);
 
     return (
         <div className="flex items-center justify-center w-full">

@@ -5,7 +5,7 @@ import { getSigninStatus } from "@store/slice/authSlice";
 import { Container, Logo, Avatar } from "@components/index";
 
 const Header: React.FC = () => {
-    const isSignedIn = useAppSelector(getSigninStatus) === "true";
+    const isSignedIn = useAppSelector(getSigninStatus);
     const [showLink, setShowLink] = useState(true);
 
     const checkWindowWidth = () => {

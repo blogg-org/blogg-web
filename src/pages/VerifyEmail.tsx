@@ -10,7 +10,7 @@ const VerifyEmail: React.FC = () => {
 
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const isSignedIn = useAppSelector(getSigninStatus) === "true";
+    const isSignedIn = useAppSelector(getSigninStatus);
 
     useEffect(() => {
         dispatch(resetVerifiedEmail());

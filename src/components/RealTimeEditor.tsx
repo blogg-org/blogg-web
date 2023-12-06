@@ -1,6 +1,6 @@
 import { Editor } from "@tinymce/tinymce-react";
 import { Control, Controller } from "react-hook-form";
-import { IPostFormData } from "src/types/blogs.types";
+import { IPostFormData } from "src/types/posts.types";
 
 interface RealTimeEditorProps {
     name?: "status" | "title" | "featuredImage" | "content" | "slug";

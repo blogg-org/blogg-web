@@ -6,6 +6,7 @@ import {
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
 import { Button } from "@components/index";
+import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { AuthStateStatus } from "src/types/auth.types";
@@ -13,6 +14,7 @@ import { useAppDispatch, useAppSelector } from "@store/store";
 
 const SigninWithGoogle: React.FC = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const authMessage = useAppSelector(getAuthMessage);
     const authError = useAppSelector(getAuthError);
     const [signinWithGoogleStatus, setSigninWithGoogleStatus] =
@@ -23,10 +25,12 @@ const SigninWithGoogle: React.FC = () => {
         onSuccess: async ({ code }) => {
             setSigninWithGoogleStatus("loading");
             const response = await dispatch(signinWithGoogle(code));
-            if (response && response.meta.requestStatus === "fulfilled") {
-                setSigninWithGoogleStatus("succeeded");
-            } else if (response && response.meta.requestStatus === "rejected") {
-                setSigninWithGoogleStatus("failed");
+            if (response) {
+                if (response.meta.requestStatus === "fulfilled") {
+                    setSigninWithGoogleStatus("succeeded");
+                } else {
+                    setSigninWithGoogleStatus("failed");
+                }
             } else {
                 setSigninWithGoogleStatus("idle");
             }
@@ -37,13 +41,15 @@ const SigninWithGoogle: React.FC = () => {
         if (signinWithGoogleStatus === "succeeded") {
             toast.success(authMessage);
         }
-        if (signinWithGoogleStatus == "failed") {
+        if (signinWithGoogleStatus === "failed") {
             toast.error(authError);
         }
-    }, [authError, authMessage, signinWithGoogleStatus]);
+        setSigninWithGoogleStatus("idle");
+    }, [authError, authMessage, signinWithGoogleStatus, navigate]);
 
     return (
         <Button
+            disabled={signinWithGoogleStatus === "loading"}
             onClick={handleSigninWithGoogleButtonClick}
             bgColor="bg-blue-100 hover:bg-blue-300"
             textColor="text-blue-800 hover:text-blue-950"

@@ -6,18 +6,20 @@ import {
     ErrorInputMessage,
     SigninWithGoogle,
 } from "@components/index";
-import { useState } from "react";
-import { useAppDispatch } from "@store/store";
-import { signin } from "@store/slice/authSlice";
+import toast from "react-hot-toast";
+import { useEffect, useState } from "react";
 import { LuEye, LuEyeOff } from "react-icons/lu";
-import { useAuthToast } from "@hooks/useAuthToast";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useAppDispatch, useAppSelector } from "@store/store";
 import { signinSchema } from "@form-validations/signin.schema";
 import { AuthStateStatus, ISigninPayload } from "src/types/auth.types";
+import { getAuthError, getAuthMessage, signin } from "@store/slice/authSlice";
 
 const Signin: React.FC = () => {
     const dispatch = useAppDispatch();
+    const authMessage = useAppSelector(getAuthMessage);
+    const authError = useAppSelector(getAuthError);
     const [signinStatus, setSigninStatus] = useState<AuthStateStatus>("idle");
     const { control, handleSubmit } = useForm<ISigninPayload>({
         resolver: yupResolver(signinSchema),
@@ -35,16 +37,26 @@ const Signin: React.FC = () => {
     const handleLogin = async (data: ISigninPayload) => {
         setSigninStatus("loading");
         const response = await dispatch(signin(data));
-        if (response && response.meta.requestStatus === "fulfilled") {
-            setSigninStatus("succeeded");
-        } else if (response && response.meta.requestStatus === "rejected") {
-            setSigninStatus("failed");
+        if (response) {
+            if (response.meta.requestStatus === "fulfilled") {
+                setSigninStatus("succeeded");
+            } else {
+                setSigninStatus("failed");
+            }
         } else {
             setSigninStatus("idle");
         }
     };
 
-    useAuthToast(signinStatus);
+    useEffect(() => {
+        if (signinStatus === "succeeded") {
+            toast.success(authMessage);
+        }
+        if (signinStatus === "failed") {
+            toast.error(authError);
+        }
+        setSigninStatus("idle");
+    }, [signinStatus, authError, authMessage]);
 
     return (
         <div className="flex items-center justify-center w-full">
@@ -60,7 +72,7 @@ const Signin: React.FC = () => {
                     Sign in to your account
                 </h2>
                 <p className="mt-2 text-center text-base text-black/60">
-                    Don&apos;t have any account?&nbsp;
+                    <span>Don&apos;t have any account?&nbsp;</span>
                     <CustomLink to="/auth/signup">Sign up</CustomLink>
                 </p>
                 <div className="w-full flex justify-center mt-6">

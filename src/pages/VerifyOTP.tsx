@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
-import { VerifyOTP as VerifyOTPFrom } from "@components/index";
-import { useDocumentTitle } from "@hooks/useDocumentTitle";
-import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "@store/store";
+import { useNavigate } from "react-router-dom";
 import { getSigninStatus } from "@store/slice/authSlice";
+import { useDocumentTitle } from "@hooks/useDocumentTitle";
+import { VerifyOTP as VerifyOTPFrom } from "@components/index";
 
 const VerifyOTP: React.FC = () => {
     useDocumentTitle("blogg - Verify OTP");
 
     const navigate = useNavigate();
-    const isSignedIn = useAppSelector(getSigninStatus) === "true";
+    const isSignedIn = useAppSelector(getSigninStatus);
 
     useEffect(() => {
         if (isSignedIn) {
