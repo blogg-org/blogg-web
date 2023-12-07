@@ -9,6 +9,7 @@ import { IAxiosError } from "src/types/axios.types";
 
 const axiosInstance: AxiosInstance = axios.create({
     baseURL: envConfig.backendBaseURI,
+    timeout: 10000,
     headers: {
         "Content-Type": "application/json",
     },
