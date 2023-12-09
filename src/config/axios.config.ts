@@ -41,7 +41,7 @@ axiosInstance.interceptors.response.use(
                 error.response.status === 401 ||
                 error.response.status === 403
             ) {
-                localStorage.setItem("isSignedIn", "false");
+                localStorage.clear();
             }
             error.message = error.response.data.message;
         }
