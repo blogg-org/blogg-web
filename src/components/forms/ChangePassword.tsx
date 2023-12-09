@@ -1,24 +1,17 @@
-import {
-    getAuthError,
-    changePassword,
-    getAuthMessage,
-} from "@store/slice/authSlice";
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useAppDispatch } from "@store/store";
+import { useAuthToast } from "@hooks/useToast";
 import { LuEye, LuEyeOff } from "react-icons/lu";
-import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useAppDispatch, useAppSelector } from "@store/store";
+import { useAppNavigate } from "@hooks/useAppNavigate";
+import { changePassword } from "@store/slice/authSlice";
 import { Logo, Input, Button, ErrorInputMessage } from "@components/index";
 import { AuthStateStatus, IChangePasswordPayload } from "src/types/auth.types";
 import { changePasswordSchema } from "@form-validations/changePassword.schema";
 
 const ChangePassword: React.FC = () => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-    const authMessage = useAppSelector(getAuthMessage);
-    const authError = useAppSelector(getAuthError);
     const [changePasswordStatus, setChangePasswordStatus] =
         useState<AuthStateStatus>("idle");
     const { control, handleSubmit } = useForm<IChangePasswordPayload>({
@@ -52,15 +45,8 @@ const ChangePassword: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        if (changePasswordStatus === "succeeded") {
-            toast.success(authMessage);
-            navigate("/");
-        }
-        if (changePasswordStatus === "failed") {
-            toast.error(authError);
-        }
-    }, [changePasswordStatus, navigate, authError, authMessage]);
+    useAuthToast(changePasswordStatus);
+    useAppNavigate(changePasswordStatus, "/");
 
     return (
         <div className="flex items-center justify-center w-full">

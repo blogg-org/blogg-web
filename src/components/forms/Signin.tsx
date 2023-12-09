@@ -6,20 +6,18 @@ import {
     ErrorInputMessage,
     SigninWithGoogle,
 } from "@components/index";
-import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useAppDispatch } from "@store/store";
+import { useAuthToast } from "@hooks/useToast";
+import { signin } from "@store/slice/authSlice";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useAppDispatch, useAppSelector } from "@store/store";
 import { signinSchema } from "@form-validations/signin.schema";
 import { AuthStateStatus, ISigninPayload } from "src/types/auth.types";
-import { getAuthError, getAuthMessage, signin } from "@store/slice/authSlice";
 
 const Signin: React.FC = () => {
     const dispatch = useAppDispatch();
-    const authMessage = useAppSelector(getAuthMessage);
-    const authError = useAppSelector(getAuthError);
     const [signinStatus, setSigninStatus] = useState<AuthStateStatus>("idle");
     const { control, handleSubmit } = useForm<ISigninPayload>({
         resolver: yupResolver(signinSchema),
@@ -48,15 +46,7 @@ const Signin: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        if (signinStatus === "succeeded") {
-            toast.success(authMessage);
-        }
-        if (signinStatus === "failed") {
-            toast.error(authError);
-        }
-        setSigninStatus("idle");
-    }, [signinStatus, authError, authMessage]);
+    useAuthToast(signinStatus);
 
     return (
         <div className="flex items-center justify-center w-full">

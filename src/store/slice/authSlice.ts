@@ -79,7 +79,7 @@ export const currentUser = createAsyncThunk("auth/currentUser", async () => {
 // signout user
 export const signout = createAsyncThunk("auth/signout", async () => {
     const response = await handleSignoutApi();
-    localStorage.setItem("isSignedIn", "false");
+    localStorage.clear();
     return response;
 });
 

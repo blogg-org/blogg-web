@@ -6,22 +6,19 @@ import {
     ErrorInputMessage,
     SigninWithGoogle,
 } from "@components/index";
-import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useAppDispatch } from "@store/store";
+import { useAuthToast } from "@hooks/useToast";
+import { signup } from "@store/slice/authSlice";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useAppDispatch, useAppSelector } from "@store/store";
+import { useAppNavigate } from "@hooks/useAppNavigate";
 import { signupSchema } from "@form-validations/signup.schema";
 import { AuthStateStatus, ISignupPayload } from "src/types/auth.types";
-import { getAuthError, getAuthMessage, signup } from "@store/slice/authSlice";
 
 const Signup: React.FC = () => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-    const authMessage = useAppSelector(getAuthMessage);
-    const authError = useAppSelector(getAuthError);
     const [signupStatus, setSignupStatus] = useState<AuthStateStatus>("idle");
     const { control, handleSubmit } = useForm<ISignupPayload>({
         defaultValues: {
@@ -55,15 +52,8 @@ const Signup: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        if (signupStatus === "succeeded") {
-            toast.success(authMessage);
-            navigate("/auth/signin");
-        }
-        if (signupStatus === "failed") {
-            toast.error(authError);
-        }
-    }, [signupStatus, navigate, authError, authMessage]);
+    useAuthToast(signupStatus);
+    useAppNavigate(signupStatus, "/auth/signin");
 
     return (
         <div className="flex items-center justify-center">

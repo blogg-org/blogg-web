@@ -1,23 +1,19 @@
 import {
     verifyOTP,
-    getAuthError,
-    getAuthMessage,
     getVerifiedEmail,
     verifyEmail,
 } from "@store/slice/authSlice";
 import toast from "react-hot-toast";
 import OTPInput from "react-otp-input";
-import { useNavigate } from "react-router-dom";
+import { useAuthToast } from "@hooks/useToast";
+import React, { FormEvent, useState } from "react";
 import { AuthStateStatus } from "src/types/auth.types";
+import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useAppDispatch, useAppSelector } from "@store/store";
-import React, { FormEvent, useEffect, useState } from "react";
 import { Button, GoBackButton, Logo } from "@components/index";
 
 const VerifyOTP: React.FC = () => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-    const authMessage = useAppSelector(getAuthMessage);
-    const authError = useAppSelector(getAuthError);
     const verifiedEmail = useAppSelector(getVerifiedEmail);
     const [otp, setOtp] = useState("");
     const [isInputError, setIsInputError] = useState<boolean>(false);
@@ -58,15 +54,8 @@ const VerifyOTP: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        if (verifyOTPStatus === "succeeded") {
-            toast.success(authMessage);
-            navigate("/auth/reset-password");
-        }
-        if (verifyOTPStatus === "failed") {
-            toast.error(authError);
-        }
-    }, [verifyOTPStatus, navigate, authError, authMessage]);
+    useAuthToast(verifyOTPStatus);
+    useAppNavigate(verifyOTPStatus, "/auth/reset-password");
 
     return (
         <div className="flex items-center justify-center w-full">

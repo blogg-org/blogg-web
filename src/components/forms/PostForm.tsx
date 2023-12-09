@@ -3,19 +3,15 @@ import {
     IPostFormData,
     PostsStateStatus,
 } from "src/types/posts.types";
-import {
-    updatePost,
-    createNewPost,
-    getPostsError,
-    getPostsMessage,
-} from "@store/slice/postsSlice";
-import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { usePostToast } from "@hooks/useToast";
 import { getAuthData } from "@store/slice/authSlice";
+import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useDocumentTitle } from "@hooks/useDocumentTitle";
 import { useAppDispatch, useAppSelector } from "@store/store";
 import React, { useCallback, useEffect, useState } from "react";
+import { updatePost, createNewPost } from "@store/slice/postsSlice";
 import { Button, Input, RealTimeEditor, Select } from "@components/index";
 
 interface PostFormProps {
@@ -28,8 +24,6 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const user = useAppSelector(getAuthData);
-    const postsMessage = useAppSelector(getPostsMessage);
-    const postsError = useAppSelector(getPostsError);
     const [postFormStatus, setPostFormStatus] =
         useState<PostsStateStatus>("idle");
     const [newPost, setNewPost] = useState<IPostFormData>({} as IPostFormData);
@@ -43,6 +37,9 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
                 status: post?.status ?? "active",
             },
         });
+
+    usePostToast(postFormStatus);
+    useAppNavigate(postFormStatus, `/posts/${newPost.slug}`);
 
     const isAuthor = post && user ? post.author === user._id : false;
 
@@ -73,16 +70,6 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
             setPostFormStatus("idle");
         }
     };
-
-    useEffect(() => {
-        if (postFormStatus === "succeeded") {
-            toast.success(postsMessage);
-            navigate(`/posts/${newPost.slug}`);
-        }
-        if (postFormStatus === "failed") {
-            toast.error(postsError);
-        }
-    }, [postFormStatus, navigate, postsError, postsMessage, newPost.slug]);
 
     // handle cancel button click
     const handleCancelButtonClick = () => {
@@ -123,19 +110,22 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
         };
     }, [watch, transformSlug, setValue, post]);
 
-    // button text
-    let btnText = "";
-    if (post) {
-        btnText = "Update";
-        if (postFormStatus === "loading") {
-            btnText = "Updating...";
+    // render update/publish button text
+    const renderButtonText = () => {
+        let btnText = "";
+        if (post) {
+            btnText = "Update";
+            if (postFormStatus === "loading") {
+                btnText = "Updating...";
+            }
+        } else {
+            btnText = "Publish";
+            if (postFormStatus === "loading") {
+                btnText += "ing...";
+            }
         }
-    } else {
-        btnText = "Publish";
-        if (postFormStatus === "loading") {
-            btnText += "ing...";
-        }
-    }
+        return btnText;
+    };
 
     return (
         <form
@@ -201,7 +191,7 @@ const PostForm: React.FC<PostFormProps> = ({ post }) => {
                             : "hover:bg-blue-700 disabled:bg-blue-400"
                     }`}
                 >
-                    {btnText}
+                    {renderButtonText()}
                 </Button>
                 <Button
                     disabled={postFormStatus === "loading"}
