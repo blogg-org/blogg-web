@@ -1,22 +1,14 @@
-import {
-    getAuthError,
-    getAuthMessage,
-    signinWithGoogle,
-} from "@store/slice/authSlice";
-import toast from "react-hot-toast";
+import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { Button } from "@components/index";
-import { useNavigate } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import { useAppDispatch } from "@store/store";
+import { useAuthToast } from "@hooks/useToast";
 import { useGoogleLogin } from "@react-oauth/google";
 import { AuthStateStatus } from "src/types/auth.types";
-import { useAppDispatch, useAppSelector } from "@store/store";
+import { signinWithGoogle } from "@store/slice/authSlice";
 
 const SigninWithGoogle: React.FC = () => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-    const authMessage = useAppSelector(getAuthMessage);
-    const authError = useAppSelector(getAuthError);
     const [signinWithGoogleStatus, setSigninWithGoogleStatus] =
         useState<AuthStateStatus>("idle");
 
@@ -37,15 +29,7 @@ const SigninWithGoogle: React.FC = () => {
         },
     });
 
-    useEffect(() => {
-        if (signinWithGoogleStatus === "succeeded") {
-            toast.success(authMessage);
-        }
-        if (signinWithGoogleStatus === "failed") {
-            toast.error(authError);
-        }
-        setSigninWithGoogleStatus("idle");
-    }, [authError, authMessage, signinWithGoogleStatus, navigate]);
+    useAuthToast(signinWithGoogleStatus);
 
     return (
         <Button

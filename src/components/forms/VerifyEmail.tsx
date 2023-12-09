@@ -5,25 +5,18 @@ import {
     GoBackButton,
     ErrorInputMessage,
 } from "@components/index";
-import {
-    verifyEmail,
-    getAuthError,
-    getAuthMessage,
-} from "@store/slice/authSlice";
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useAppDispatch } from "@store/store";
+import { useAuthToast } from "@hooks/useToast";
+import { verifyEmail } from "@store/slice/authSlice";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useAppDispatch, useAppSelector } from "@store/store";
+import { useAppNavigate } from "@hooks/useAppNavigate";
 import { verifyEmailSchema } from "@form-validations/verifyEmail.schema";
 import { AuthStateStatus, IVerifyEmailPayload } from "src/types/auth.types";
 
 const VerifyEmail: React.FC = () => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-    const authMessage = useAppSelector(getAuthMessage);
-    const authError = useAppSelector(getAuthError);
     const [verifyEmailStatus, setVerifyEmailStatus] =
         useState<AuthStateStatus>("idle");
     const { control, handleSubmit } = useForm<IVerifyEmailPayload>({
@@ -47,15 +40,8 @@ const VerifyEmail: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        if (verifyEmailStatus === "succeeded") {
-            toast.success(authMessage);
-            navigate("/auth/verify-otp");
-        }
-        if (verifyEmailStatus === "failed") {
-            toast.error(authError);
-        }
-    }, [verifyEmailStatus, navigate, authError, authMessage]);
+    useAuthToast(verifyEmailStatus);
+    useAppNavigate(verifyEmailStatus, "/auth/verify-otp");
 
     return (
         <div className="flex items-center justify-center w-full">

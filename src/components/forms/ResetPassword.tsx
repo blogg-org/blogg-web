@@ -5,27 +5,19 @@ import {
     GoBackButton,
     ErrorInputMessage,
 } from "@components/index";
-import {
-    getAuthError,
-    resetPassword,
-    getAuthMessage,
-    getVerifiedEmail,
-} from "@store/slice/authSlice";
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useAuthToast } from "@hooks/useToast";
 import { LuEye, LuEyeOff } from "react-icons/lu";
-import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useAppNavigate } from "@hooks/useAppNavigate";
 import { useAppDispatch, useAppSelector } from "@store/store";
+import { resetPassword, getVerifiedEmail } from "@store/slice/authSlice";
 import { resetPasswordSchema } from "@form-validations/resetPassword.schema";
 import { AuthStateStatus, IResetPasswordPayload } from "src/types/auth.types";
 
 const ResetPassword: React.FC = () => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-    const authMessage = useAppSelector(getAuthMessage);
-    const authError = useAppSelector(getAuthError);
     const verifiedEmail = useAppSelector(getVerifiedEmail);
     const [passwordType, setPasswordType] = useState<string>("password");
     const [resetPasswordStatus, setResetPasswordStatus] =
@@ -61,15 +53,8 @@ const ResetPassword: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        if (resetPasswordStatus === "succeeded") {
-            toast.success(authMessage);
-            navigate("/auth/signin");
-        }
-        if (resetPasswordStatus === "failed") {
-            toast.error(authError);
-        }
-    }, [resetPasswordStatus, navigate, authError, authMessage]);
+    useAuthToast(resetPasswordStatus);
+    useAppNavigate(resetPasswordStatus, "/auth/signin");
 
     return (
         <div className="flex items-center justify-center w-full">

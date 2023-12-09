@@ -1,25 +1,18 @@
-import {
-    deletePost,
-    getPostsError,
-    getPostFromSlug,
-    getPostsMessage,
-} from "@store/slice/postsSlice";
-import toast from "react-hot-toast";
+import { useState } from "react";
 import parse from "html-react-parser";
 import { Button } from "@components/index";
-import { useEffect, useState } from "react";
+import { usePostToast } from "@hooks/useToast";
+import { Link, useParams } from "react-router-dom";
 import { getAuthData } from "@store/slice/authSlice";
+import { useAppNavigate } from "@hooks/useAppNavigate";
 import { PostsStateStatus } from "src/types/posts.types";
 import { useDocumentTitle } from "@hooks/useDocumentTitle";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { deletePost, getPostFromSlug } from "@store/slice/postsSlice";
 import { rootState, useAppDispatch, useAppSelector } from "@store/store";
 
 const Post: React.FC = () => {
     const { slug } = useParams();
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-    const postsMessage = useAppSelector(getPostsMessage);
-    const postsError = useAppSelector(getPostsError);
     const post = useAppSelector((state: typeof rootState) =>
         getPostFromSlug(state, slug!)
     );
@@ -45,15 +38,8 @@ const Post: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        if (postStatus === "succeeded") {
-            toast.success(postsMessage);
-            navigate("/");
-        }
-        if (postStatus === "failed") {
-            toast.error(postsError);
-        }
-    }, [postStatus, navigate, postsError, postsMessage]);
+    usePostToast(postStatus);
+    useAppNavigate(postStatus, "/");
 
     if (post && Object.keys(post).length > 0) {
         return (

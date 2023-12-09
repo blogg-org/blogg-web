@@ -1,18 +1,12 @@
-import {
-    signout,
-    getAuthData,
-    getAuthError,
-    getAuthMessage,
-    getSigninStatus,
-} from "@store/slice/authSlice";
-import toast from "react-hot-toast";
+import { useAuthToast } from "@hooks/useToast";
+import React, { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import defaultUserIcon from "@assets/user-alien.svg";
 import { resetPosts } from "@store/slice/postsSlice";
 import { AuthStateStatus } from "src/types/auth.types";
 import { NavLink, useNavigate } from "react-router-dom";
-import React, { Fragment, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@store/store";
+import { signout, getAuthData, getSigninStatus } from "@store/slice/authSlice";
 
 interface AvatarProps {
     showLink: boolean;
@@ -21,8 +15,6 @@ interface AvatarProps {
 const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const authMessage = useAppSelector(getAuthMessage);
-    const authError = useAppSelector(getAuthError);
     const isSignedIn = useAppSelector(getSigninStatus);
     const authData = useAppSelector(getAuthData);
     const [signoutStatus, setSignoutStatus] = useState<AuthStateStatus>("idle");
@@ -46,15 +38,7 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
         }
     };
 
-    useEffect(() => {
-        if (signoutStatus === "succeeded") {
-            toast.success(authMessage);
-        }
-        if (signoutStatus === "failed") {
-            toast.error(authError);
-        }
-        setSignoutStatus("idle");
-    }, [signoutStatus, navigate, authError, authMessage]);
+    useAuthToast(signoutStatus);
 
     return (
         <Menu as="div" className="group relative z-50">
