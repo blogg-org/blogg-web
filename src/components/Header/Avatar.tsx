@@ -86,7 +86,8 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                                     <Menu.Item>
                                         {() => (
                                             <NavLink
-                                                to="/all-posts"
+                                                to="/posts"
+                                                end
                                                 className={({ isActive }) =>
                                                     `w-full block p-2 border border-blue-500 hover:bg-blue-500 text-center rounded-md text-base transition-colors duration-200 ease-in disabled:cursor-not-allowed ${
                                                         isActive
@@ -103,7 +104,8 @@ const Avatar: React.FC<AvatarProps> = ({ showLink }) => {
                                     <Menu.Item>
                                         {() => (
                                             <NavLink
-                                                to="/add-post"
+                                                to="/posts/add"
+                                                end
                                                 className={({ isActive }) =>
                                                     `w-full block p-2 border border-blue-500 hover:bg-blue-500 text-center rounded-md text-base transition-colors duration-200 ease-in disabled:cursor-not-allowed ${
                                                         isActive
